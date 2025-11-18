@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>退货申请</title>
+    <!-- 适配 iPhone（宽度按 430px 设计，接近 iPhone 16 Pro Max 逻辑宽度） -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 430px;          /* ① 以 iPhone 16 宽度为参考 */
+            margin: 30px auto;
+            padding: 0 12px;
+        }
+        .top-tools {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        .tool-btn {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            background: #fafafa;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* 去掉外层红色大框，只保留卡片样式 */
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px 14px 22px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.04);
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 18px;
+            color: #888;
+        }
+        .step-active {
+            color: #00b578;
+            font-weight: 600;
+        }
+        h3 {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .deadline {
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 16px;
+        }
+
+        .return-methods {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .method {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            padding: 9px 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .method-desc {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #999;
+        }
+        .method.active {
+            border-color: #ff7d00;
+            background: #fff7eb;
+            color: #ff7d00;
+        }
+
+        .notice {
+            background: #fff7eb;
+            color: #ff7d00;
+            font-size: 13px;
+            padding: 8px 9px;
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        .helper-block-title {
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #555;
+        }
+        .helper-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .helper-textarea {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 7px 8px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 50px;
+        }
+        .helper-btn {
+            width: 86px;
+            border-radius: 4px;
+            border: none;
+            background: #ff7d00;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .helper-tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: -6px;
+            margin-bottom: 10px;
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .copy-btn {
+            color: #ff7d00;
+            cursor: pointer;
+        }
+
+        .textarea, .input {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 8px 9px;
+            font-size: 14px;
+        }
+        .textarea {
+            resize: none;
+            height: 56px;
+            margin-bottom: 10px;
+        }
+        .input {
+            margin-bottom: 16px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 10px 0;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 14px;
+        }
+
+        .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        .bottom-row span {
+            color: #ff7d00;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="top-tools">
+        <button class="tool-btn" id="resetBtn">重置内容</button>
+    </div>
+
+    <div class="card">
+        <!-- 步骤条 -->
+        <div class="steps">
+            <div class="step-active">● 商家处理</div>
+            <div>2 寄回商品</div>
+            <div>3 退款结束</div>
+        </div>
+
+        <h3>请选择退货方式</h3>
+        <div class="deadline">6天23时59分后未寄出将撤销退货申请</div>
+
+        <!-- 退货方式 -->
+        <div class="return-methods" id="methods">
+            <div class="method">
+                上门取件
+                <div class="method-desc">快递员上门取包裹</div>
+            </div>
+            <div class="method">
+                驿站自寄
+                <div class="method-desc">免费包装</div>
+            </div>
+            <div class="method active">
+                自行寄回
+                <div class="method-desc">需填写单号</div>
+            </div>
+        </div>
+
+        <div class="notice">
+            需您自行联系快递公司退回，请不要邮寄到付
+        </div>
+
+        <!-- ③ 一键识别整段地址 + 手机号 + 姓名 -->
+        <div class="helper-block-title">整段地址识别（包含姓名 + 手机号 + 地址）</div>
+        <div class="helper-row">
+            <textarea id="rawInfo" class="helper-textarea"
+                      placeholder="示例：张三 13812345678 上海市浦东新区川沙新镇××××"></textarea>
+            <button class="helper-btn" id="parseBtn">一键识别</button>
+        </div>
+        <div class="helper-tip">
+            默认按“姓名 手机号 地址”的顺序识别，如格式特别乱，识别后再手动微调。
+        </div>
+
+        <!-- 商家地址 -->
+        <div class="address-header">
+            <span>商家地址</span>
+            <span class="copy-btn" id="copyAddr">复制地址</span>
+        </div>
+        <textarea id="addr" class="textarea"
+                  placeholder="请输入商家地址（例：天津市河北区鸿顺里街道××）"></textarea>
+        <input id="contact" class="input"
+               placeholder="请输入商家姓名和电话（例：张三，13800000000）">
+
+        <button class="submit-btn">填写单号</button>
+
+        <div class="bottom-row">
+            <div>商品图占位</div>
+            <span>退货包运费</span>
+        </div>
+
+        <div class="actions">
+            <button class="action-btn">平台介入</button>
+            <button class="action-btn">撤销申请</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 切换退货方式高亮
+    const methods = document.querySelectorAll('#methods .method');
+    methods.forEach(m => {
+        m.addEventListener('click', () => {
+            methods.forEach(x => x.classList.remove('active'));
+            m.classList.add('active');
+        });
+    });
+
+    // 重置
+    document.getElementById('resetBtn').onclick = () => {
+        document.getElementById('addr').value = '';
+        document.getElementById('contact').value = '';
+        document.getElementById('rawInfo').value = '';
+    };
+
+    // 复制地址
+    document.getElementById('copyAddr').onclick = async () => {
+        const addr = document.getElementById('addr').value.trim();
+        if (!addr) { alert('请先填写地址再复制'); return; }
+        try {
+            await navigator.clipboard.writeText(addr);
+            alert('地址已复制');
+        } catch (e) {
+            alert('复制失败，请手动选择复制');
+        }
+    };
+
+    // ③ 一键识别整段地址：默认格式「姓名 手机号 地址」
+    document.getElementById('parseBtn').onclick = () => {
+        let raw = document.getElementById('rawInfo').value.trim();
+        if (!raw) {
+            alert('请先粘贴整段地址信息');
+            return;
+        }
+
+        // 去掉多余空白，统一成一个空格分隔
+        raw = raw.replace(/\s+/g, ' ');
+
+        // 手机号：大陆 11 位，以 1 开头
+        const phoneMatch = raw.match(/1[3-9]\d{9}/);
+        if (!phoneMatch) {
+            alert('未识别到 11 位手机号码，请检查格式');
+            return;
+        }
+        const phone = phoneMatch[0];
+
+        // 按手机号拆分成「前」「后」两部分
+        const parts = raw.split(phone);
+        const before = (parts[0] || '').trim();
+        const after  = (parts[1] || '').trim();
+
+        // 简单规则：默认“姓名 手机号 地址”
+        // -> before 里取最后 2~4 个中文作为姓名，其余全部视为前缀（通常没有地址）
+        let name = before;
+        // 只保留中文和常见符号，尽量防止乱七八糟的内容
+        name = name.replace(/[^一-龥·\.]/g, '');
+        if (name.length > 4) {
+            name = name.slice(-3);  // 超过 4 个字符，就取最后 3 个当姓名
+        }
+
+        // 地址：优先用手机号后的部分
+        let addr = after || '';
+        addr = addr.replace(/[,，。;；]/g, '').trim();
+
+        // 回填
+        if (addr) {
+            document.getElementById('addr').value = addr;
+        }
+        document.getElementById('contact').value = name
+            ? `${name}，${phone}`
+            : phone;
+
+        if (!addr) {
+            alert('已识别姓名和手机号，地址请手动补全或调整。');
+        }
+    };
+</script>
+</body>
+</html>
