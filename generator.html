@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
   <title>退货退款详情</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -13,6 +13,7 @@
       background: #efefef;
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       color: #222;
+      overflow-x: hidden;
     }
 
     :root {
@@ -22,20 +23,39 @@
       --light-gray: #efefef;
       --text-gray: #9f9f9f;
       --border-gray: #b9b9b9;
+      --stage-scale: 1;
     }
 
     body {
       display: flex;
       justify-content: center;
+      background: #efefef;
+    }
+
+    .page-shell {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    .scale-viewport {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
 
     .phone {
-      width: 100%;
-      max-width: var(--phone-width);
+      width: var(--phone-width);
       min-height: 100vh;
       background: var(--light-gray);
       position: relative;
       overflow-x: hidden;
+      transform-origin: top center;
+      transform: scale(var(--stage-scale));
+      will-change: transform;
     }
 
     .status-bar {
@@ -494,27 +514,15 @@
     .editor-title {
       font-size: 22px;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .hint {
       font-size: 16px;
       color: #888;
       line-height: 1.5;
-      margin-bottom: 10px;
-    }
-
-    .status-tip {
-      font-size: 15px;
       margin-bottom: 14px;
-      line-height: 1.4;
-      color: #666;
-      min-height: 21px;
     }
-
-    .status-tip.high { color: #1f8f45; }
-    .status-tip.medium { color: #d68a00; }
-    .status-tip.low { color: #d14343; }
 
     .textarea,
     .input {
@@ -570,163 +578,146 @@
       display: block;
     }
 
-    @media (max-width: 828px) {
-      .phone { max-width: 100vw; }
+    .export-clone {
+      position: fixed;
+      left: -99999px;
+      top: 0;
+      width: 828px;
+      z-index: -1;
+      pointer-events: none;
     }
 
-    @media (max-width: 700px) {
-      .status-bar { height: 56px; padding: 0 16px; }
-      .status-left { font-size: 20px; }
-      .topbar { height: 64px; }
-      .title { font-size: 22px; }
-      .topbar-left, .topbar-right { min-width: 108px; gap: 14px; }
-      .back { font-size: 32px; }
-      .icon { width: 28px; height: 28px; }
-      .badge { min-width: 24px; height: 24px; font-size: 12px; }
-      .content { padding: 10px 10px 14px; }
-      .card, .editor-panel { border-radius: 18px; padding: 20px 18px; margin-left: 10px; margin-right: 10px; }
-      .timeline-card { padding-left: 54px; }
-      .timeline { left: 24px; top: 30px; bottom: 28px; }
-      .dot { left: 16px; width: 16px; height: 16px; }
-      .dot.active { left: 15px; top: 112px; width: 18px; height: 18px; }
-      .dot.bottom { left: 17px; width: 15px; height: 15px; }
-      .step-small, .footer-label, .process-link, .receiver-row, .service-title, .service-row, .date-right, .sent-title { font-size: 18px; }
-      .step-title { font-size: 22px; }
-      .countdown, .subtitle, .desc, .address, .service-left h3, .service-desc, .sent-sub { font-size: 16px; }
-      .primary-btn { min-width: 170px; height: 56px; font-size: 18px; }
-      .outline-btn { min-width: 150px; height: 52px; font-size: 18px; }
-      .bottom-actions { padding: 8px 12px 18px; }
-      .ghost-btn { height: 48px; padding: 0 20px; font-size: 15px; }
-      .nav-bar { height: 62px; font-size: 24px; }
-      .input, .textarea { font-size: 16px; }
-      .mini-grid { grid-template-columns: 1fr; }
+    .phone.exporting {
+      transform: none !important;
+      width: 828px !important;
+      max-width: none !important;
+      min-height: auto !important;
     }
 
-    .shot-mode .hide-on-shot {
+    .phone.exporting .hide-on-shot {
       display: none !important;
     }
   </style>
 </head>
 <body>
-  <div class="phone" id="captureRoot">
-    <div class="status-bar">
-      <div class="status-left">5:25 <span style="font-size:16px;opacity:.9;">淘</span> <span style="font-size:16px;opacity:.9;">🛍</span></div>
-      <div class="status-icons">
-        <span>◔</span>
-        <span>⏰</span>
-        <span>◔</span>
-        <span style="font-size:18px;">4G</span>
-        <span>▮▮▮</span>
-        <span class="pill-battery">100</span>
-      </div>
-    </div>
-
-    <div class="topbar">
-      <div class="topbar-left">
-        <div class="back">←</div>
-      </div>
-      <div class="title">退货退款详情</div>
-      <div class="topbar-right">
-        <div class="icon refresh"></div>
-        <div class="icon share"></div>
-        <div class="icon more"><span></span></div>
-        <div class="badge">57</div>
-      </div>
-    </div>
-
-    <div class="editor-panel hide-on-shot">
-      <div class="editor-title">地址录入</div>
-      <div class="hint">支持格式：标签型、多行、地址+姓名+电话、姓名+电话+地址、无空格连写、单个姓、电话带分机。</div>
-      <div class="status-tip" id="statusTip"></div>
-      <textarea id="fullAddressInput" class="textarea" placeholder="整段粘贴示例：
-收货人：张三
-手机号码：18888888888
-所在地区：新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县
-详细地址：宽店镇0"></textarea>
-      <div class="mini-grid">
-        <input id="receiverInput" class="input" placeholder="收货人" value="详细地址联系客服" />
-        <input id="phoneInput" class="input" placeholder="手机号/分机" value="18888888888" />
-      </div>
-      <textarea id="addressInput" class="textarea" placeholder="详细地址">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</textarea>
-      <div class="editor-actions">
-        <button class="small-btn" id="parseBtn">粘贴并识别</button>
-        <button class="small-btn secondary" id="applyBtn">应用到页面</button>
-        <button class="small-btn secondary" id="fillSampleBtn">恢复示例</button>
-      </div>
-    </div>
-
-    <div class="content">
-      <div class="card timeline-card">
-        <div class="timeline"></div>
-        <div class="dot top"></div>
-        <div class="dot active"></div>
-        <div class="dot bottom"></div>
-
-        <div class="step-small">商家处理</div>
-
-        <div class="step-title-line">
-          <div class="step-title">寄回商品</div>
-          <div class="countdown" id="countdownText">还剩6天23时59分</div>
-        </div>
-
-        <div class="subtitle">请退货并填写物流信息</div>
-        <div class="desc">未与商家协商一致，请勿使用到付或平邮，以免商家拒签货物</div>
-        <div class="desc">交易的钱款还在天猫中间账户，确保您资金安全</div>
-        <div class="desc">请填写真实退货物流信息，逾期未填写，退货申请将关闭</div>
-        <div class="desc">平台支持您的退款申请。</div>
-
-        <div class="footer-row">
-          <div class="footer-label">商家退款</div>
-          <div class="process-link">全部流程 <span class="arrow">›</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="receiver-row">
-          <span>收货人：</span>
-          <span id="receiverText">详细地址联系客服</span>
-          <span class="receiver-phone" id="phoneText">18888888888</span>
-        </div>
-        <div class="address">
-          <span id="addressText">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</span>
-          <span class="copy" id="copyBtn">复制</span>
-        </div>
-
-        <div class="service-box">
-          <div class="service-left">
-            <h3>官方推荐寄件服务 <span class="tag">一键退货</span></h3>
-            <div class="service-desc">大件专属服务，3公斤以上更划算，丢损必赔</div>
+  <div class="page-shell">
+    <div class="scale-viewport" id="scaleViewport">
+      <div class="phone" id="captureRoot">
+        <div class="status-bar">
+          <div class="status-left">5:25 <span style="font-size:16px;opacity:.9;">淘</span> <span style="font-size:16px;opacity:.9;">🛍</span></div>
+          <div class="status-icons">
+            <span>◔</span>
+            <span>⏰</span>
+            <span>◔</span>
+            <span style="font-size:18px;">4G</span>
+            <span>▮▮▮</span>
+            <span class="pill-battery">100</span>
           </div>
-          <button class="primary-btn">我要寄件</button>
         </div>
 
-        <div class="sent-row">
-          <div>
-            <div class="sent-title">我已寄出</div>
-            <div class="sent-sub">点击填写物流单号</div>
+        <div class="topbar">
+          <div class="topbar-left">
+            <div class="back">←</div>
           </div>
-          <button class="outline-btn">填写单号</button>
+          <div class="title">退货退款详情</div>
+          <div class="topbar-right">
+            <div class="icon refresh"></div>
+            <div class="icon share"></div>
+            <div class="icon more"><span></span></div>
+            <div class="badge">57</div>
+          </div>
+        </div>
+
+        <div class="editor-panel hide-on-shot">
+          <div class="editor-title">地址录入</div>
+          <div class="hint">可手动填写，也可把整段地址直接粘贴到下方，一键拆分到对应位置。</div>
+          <textarea id="fullAddressInput" class="textarea" placeholder="整段粘贴示例：&#10;收货人：张三 18888888888&#10;新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0"></textarea>
+          <div class="mini-grid">
+            <input id="receiverInput" class="input" placeholder="收货人" value="详细地址联系客服" />
+            <input id="phoneInput" class="input" placeholder="手机号" value="18888888888" />
+          </div>
+          <textarea id="addressInput" class="textarea" placeholder="详细地址">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</textarea>
+          <div class="editor-actions">
+            <button class="small-btn" id="parseBtn">粘贴并识别</button>
+            <button class="small-btn secondary" id="applyBtn">应用到页面</button>
+            <button class="small-btn secondary" id="fillSampleBtn">恢复示例</button>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="card timeline-card">
+            <div class="timeline"></div>
+            <div class="dot top"></div>
+            <div class="dot active"></div>
+            <div class="dot bottom"></div>
+
+            <div class="step-small">商家处理</div>
+
+            <div class="step-title-line">
+              <div class="step-title">寄回商品</div>
+              <div class="countdown" id="countdownText">还剩6天23时59分</div>
+            </div>
+
+            <div class="subtitle">请退货并填写物流信息</div>
+            <div class="desc">未与商家协商一致，请勿使用到付或平邮，以免商家拒签货物</div>
+            <div class="desc">交易的钱款还在天猫中间账户，确保您资金安全</div>
+            <div class="desc">请填写真实退货物流信息，逾期未填写，退货申请将关闭</div>
+            <div class="desc">平台支持您的退款申请。</div>
+
+            <div class="footer-row">
+              <div class="footer-label">商家退款</div>
+              <div class="process-link">全部流程 <span class="arrow">›</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="receiver-row">
+              <span>收货人：</span>
+              <span id="receiverText">详细地址联系客服</span>
+              <span class="receiver-phone" id="phoneText">18888888888</span>
+            </div>
+            <div class="address">
+              <span id="addressText">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</span>
+              <span class="copy" id="copyBtn">复制</span>
+            </div>
+
+            <div class="service-box">
+              <div class="service-left">
+                <h3>官方推荐寄件服务 <span class="tag">一键退货</span></h3>
+                <div class="service-desc">大件专属服务，3公斤以上更划算，丢损必赔</div>
+              </div>
+              <button class="primary-btn">我要寄件</button>
+            </div>
+
+            <div class="sent-row">
+              <div>
+                <div class="sent-title">我已寄出</div>
+                <div class="sent-sub">点击填写物流单号</div>
+              </div>
+              <button class="outline-btn">填写单号</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="service-title">我的服务</div>
+            <div class="service-row">
+              <div>7天无理由退换</div>
+              <div class="date-right">11月16日24点前可享 <span class="arrow">›</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-actions">
+          <button class="ghost-btn">平台介入</button>
+          <button class="ghost-btn" id="exportBtn">撤销申请</button>
+        </div>
+
+        <div class="nav-bar">
+          <span>□</span>
+          <span>○</span>
+          <span>△</span>
         </div>
       </div>
-
-      <div class="card">
-        <div class="service-title">我的服务</div>
-        <div class="service-row">
-          <div>7天无理由退换</div>
-          <div class="date-right">11月16日24点前可享 <span class="arrow">›</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="bottom-actions">
-      <button class="ghost-btn">平台介入</button>
-      <button class="ghost-btn" id="exportBtn">撤销申请</button>
-    </div>
-
-    <div class="nav-bar">
-      <span>□</span>
-      <span>○</span>
-      <span>△</span>
     </div>
   </div>
 
@@ -742,7 +733,14 @@
     const addressText = document.getElementById('addressText');
     const countdownText = document.getElementById('countdownText');
     const captureRoot = document.getElementById('captureRoot');
-    const statusTip = document.getElementById('statusTip');
+    const scaleViewport = document.getElementById('scaleViewport');
+
+    function updateStageScale() {
+      const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const scale = Math.min(1, viewportWidth / 828);
+      document.documentElement.style.setProperty('--stage-scale', scale.toString());
+      scaleViewport.style.height = `${captureRoot.scrollHeight * scale}px`;
+    }
 
     function randomCountdown() {
       const maxMinutes = 6 * 24 * 60 + 23 * 60 + 59;
@@ -757,234 +755,119 @@
       receiverText.textContent = receiverInput.value.trim() || '详细地址联系客服';
       phoneText.textContent = phoneInput.value.trim() || '18888888888';
       addressText.textContent = addressInput.value.trim() || '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
+      requestAnimationFrame(updateStageScale);
     }
 
-    function setStatusTip(level, text) {
-      statusTip.className = 'status-tip';
-      if (level) statusTip.classList.add(level);
-      statusTip.textContent = text || '';
-    }
+    function parseCombinedText(raw) {
+      const text = raw.replace(/\r/g, '\n').trim();
+      if (!text) return;
 
-    function normalizeText(text) {
-      return text
-        .replace(/\r/g, '\n')
-        .replace(/[：:]/g, '：')
-        .replace(/[，,;；|｜]/g, ' ')
-        .replace(/\u00A0/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function escapeRegExp(str) {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    function extractPhone(text) {
-      const m = text.match(/1\d{10}(?:-\d{1,6})?/);
-      return m ? m[0] : '';
-    }
-
-    function extractLabeledFields(text) {
-      const out = {
-        receiver: '',
-        phone: '',
-        region: '',
-        detail: '',
-        address: ''
-      };
-
-      const receiver = text.match(/(?:收货人|收件人|联系人)\s*：\s*([^\s]+?)(?=\s+(?:手机号码|手机号|电话|所在地区|详细地址|地址)|$)/);
-      if (receiver) out.receiver = receiver[1].trim();
-
-      const phone = text.match(/(?:手机号码|手机号|电话)\s*：\s*(1\d{10}(?:-\d{1,6})?)/);
-      if (phone) out.phone = phone[1].trim();
-
-      const region = text.match(/所在地区\s*：\s*(.+?)(?=\s*(?:详细地址|地址)\s*：|$)/);
-      if (region) out.region = region[1].trim();
-
-      const detail = text.match(/(?:详细地址|地址)\s*：\s*(.+)$/);
-      if (detail) out.detail = detail[1].trim();
-
-      out.address = [out.region, out.detail].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
-      return out;
-    }
-
-    function looksLikeName(token) {
-      if (!token) return false;
-      const t = token.trim();
-      if (!/^[\u4e00-\u9fa5·]{1,6}$/.test(t)) return false;
-      if (/^(收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址|地区)$/.test(t)) return false;
-      if (/(省|市|区|县|镇|乡|街道|街|路|道|巷|弄|号|栋|幢|座|单元|室|楼|广场|大厦|小区|花园|公寓|村|组|苑|城|湾|府|里|庭|园区|工业园|开发区)$/.test(t)) return false;
-      if (/^(北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|台湾|内蒙古|广西|西藏|宁夏|新疆|香港|澳门)/.test(t)) return false;
-      return true;
-    }
-
-    function cleanAddressNoise(text) {
-      return text
-        .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址)\s*：?/g, ' ')
-        .replace(/^码\s*[:：]?\s*/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function guessReceiverAndAddress(text, phone, fallbackReceiver) {
-      let receiver = fallbackReceiver || '';
+      let receiver = '';
+      let phone = '';
       let address = '';
 
-      let working = cleanAddressNoise(text);
-      if (phone) working = working.replace(new RegExp(escapeRegExp(phone), 'g'), ' ');
-      working = working.replace(/\s+/g, ' ').trim();
+      const joined = text.split(/\n+/).map(v => v.trim()).filter(Boolean).join(' ');
 
-      const tokens = working.split(/\s+/).filter(Boolean);
-      const compact = working.replace(/\s+/g, '');
-      const addressKeywords = /省|市|区|县|镇|乡|街道|街|路|道|巷|弄|号|栋|幢|座|单元|室|楼|广场|大厦|小区|花园|公寓|村|组|苑|城|湾|府|里|庭|园区|工业园|开发区/;
+      const phoneMatch = joined.match(/1\d{10}(?:-\d{1,6})?/);
+      if (phoneMatch) phone = phoneMatch[0];
 
-      if (!receiver) {
-        for (let i = tokens.length - 1; i >= 0; i--) {
-          if (looksLikeName(tokens[i])) {
-            receiver = tokens[i];
-            break;
-          }
-        }
+      const receiverMatch = joined.match(/(?:收货人|收件人|联系人)[:：]?\s*([^\s]+)(?=\s|$)/);
+      if (receiverMatch) receiver = receiverMatch[1].trim();
+
+      const regionMatch = joined.match(/所在地区[:：]?\s*(.+?)(?=\s*(?:详细地址|地址)[:：]?|$)/);
+      const detailMatch = joined.match(/(?:详细地址|地址)[:：]?\s*(.+)$/);
+
+      if (regionMatch || detailMatch) {
+        address = [regionMatch ? regionMatch[1].trim() : '', detailMatch ? detailMatch[1].trim() : '']
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
       }
 
       if (!receiver) {
-        for (let len = 4; len >= 1; len--) {
-          const tail = compact.slice(-len);
-          const prefix = compact.slice(0, -len);
-          if (looksLikeName(tail) && addressKeywords.test(prefix)) {
-            receiver = tail;
-            break;
-          }
-        }
-      }
-
-      if (!receiver && phone) {
-        const dense = normalizeText(text).replace(/\s+/g, '');
-        const idx = dense.indexOf(phone);
-
-        if (idx >= 0) {
-          const left = dense
-            .slice(0, idx)
-            .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址|：)/g, '');
-
-          const right = dense
-            .slice(idx + phone.length)
-            .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址|：)/g, '');
-
-          for (let len = 4; len >= 1; len--) {
-            const leftTail = left.slice(-len);
-            const leftPrefix = left.slice(0, -len);
-            if (looksLikeName(leftTail) && addressKeywords.test(leftPrefix)) {
-              receiver = leftTail;
-              address = (leftPrefix + right).trim();
-              break;
-            }
-          }
-
-          if (!receiver) {
-            for (let len = 4; len >= 1; len--) {
-              const rightHead = right.slice(0, len);
-              const rightRest = right.slice(len);
-              if (looksLikeName(rightHead) && addressKeywords.test(rightRest)) {
-                receiver = rightHead;
-                address = (left + rightRest).trim();
-                break;
-              }
-            }
-          }
-
-          if (!receiver && looksLikeName(left)) {
-            receiver = left;
-            address = right;
+        const stripped = joined
+          .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址)[:：]?/g, ' ')
+          .replace(phone || '', ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const compact = stripped.replace(/\s+/g, '');
+        const tail = compact.match(/([\u4e00-\u9fa5·]{1,6})$/);
+        if (tail) {
+          const t = tail[1];
+          if (!/(省|市|区|县|镇|乡|街道|街|路|道|巷|弄|号|栋|幢|座|单元|室|楼)$/.test(t)) {
+            receiver = t;
           }
         }
       }
 
       if (!address) {
-        address = working;
+        let merged = joined
+          .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址)[:：]?/g, ' ')
+          .replace(phone || '', ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
         if (receiver) {
-          address = address
-            .replace(new RegExp('^' + escapeRegExp(receiver)), '')
-            .replace(new RegExp(escapeRegExp(receiver) + '$'), '')
-            .trim();
+          const escaped = receiver.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          merged = merged.replace(new RegExp('^' + escaped), '').replace(new RegExp(escaped + '$'), '').trim();
         }
+        merged = merged.replace(/^码[:：]?\s*/, '').trim();
+        address = merged;
       }
 
-      address = cleanAddressNoise(address);
-      return { receiver, address };
-    }
-
-    function scoreResult(normalized, result) {
-      let score = 0;
-
-      if (result.phone) score += 35;
-      if (result.receiver && result.receiver !== '详细地址联系客服') score += 25;
-      if (result.address) score += 25;
-
-      if (/(收货人|收件人|联系人)\s*：/.test(normalized) && result.receiver) score += 10;
-      if (/(手机号码|手机号|电话)\s*：/.test(normalized) && result.phone) score += 10;
-      if (/(所在地区|详细地址|地址)\s*：/.test(normalized) && result.address) score += 10;
-
-      if (result.receiver && looksLikeName(result.receiver)) score += 5;
-      if (result.address && /省|市|区|县|镇|乡|街道|路|号|栋|单元|室|小区|花园|公寓|村/.test(result.address)) score += 10;
-
-      if (result.address && /^码[:：]/.test(result.address)) score -= 20;
-      if (result.address && /^(手机号码|手机号|电话|所在地区|详细地址|地址)[:：]/.test(result.address)) score -= 15;
-
-      if (score >= 85) return { level: 'high', text: '高置信度：已自动识别。' };
-      if (score >= 60) return { level: 'medium', text: '中置信度：建议检查姓名和地址。' };
-      return { level: 'low', text: '低置信度：请手动检查后再导出截图。' };
-    }
-
-    function parseAddressSmart(raw) {
-      const normalized = normalizeText(raw);
-      const labeled = extractLabeledFields(normalized);
-      const phone = labeled.phone || extractPhone(normalized);
-      const guessed = guessReceiverAndAddress(normalized, phone, labeled.receiver);
-
-      const result = {
-        receiver: labeled.receiver || guessed.receiver,
-        phone,
-        address: labeled.address || guessed.address
-      };
-
-      result.confidence = scoreResult(normalized, result);
-      return result;
-    }
-
-    function parseCombinedText(raw) {
-      const text = raw.trim();
-      if (!text) {
-        setStatusTip('low', '请输入要识别的地址信息。');
-        return;
-      }
-
-      const result = parseAddressSmart(text);
-
-      receiverInput.value = result.receiver || '详细地址联系客服';
-      phoneInput.value = result.phone || phoneInput.value.trim() || '18888888888';
-      addressInput.value = result.address || addressInput.value.trim() || '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
-
-      setStatusTip(result.confidence.level, result.confidence.text);
+      if (receiver) receiverInput.value = receiver;
+      if (phone) phoneInput.value = phone;
+      if (address) addressInput.value = address;
       applyAddress();
+    }
+
+    async function exportScreenshot() {
+      applyAddress();
+
+      const clone = captureRoot.cloneNode(true);
+      clone.id = 'captureClone';
+      clone.classList.add('exporting');
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'export-clone';
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
+
+      try {
+        const canvas = await html2canvas(clone, {
+          useCORS: true,
+          backgroundColor: '#efefef',
+          scale: 2,
+          width: 828,
+          windowWidth: 828,
+          windowHeight: clone.scrollHeight,
+          scrollX: 0,
+          scrollY: 0
+        });
+
+        const link = document.createElement('a');
+        link.download = '退货退款详情截图.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        alert('导出失败');
+      } finally {
+        wrapper.remove();
+      }
     }
 
     document.getElementById('parseBtn').addEventListener('click', () => {
       parseCombinedText(fullAddressInput.value);
     });
 
-    document.getElementById('applyBtn').addEventListener('click', () => {
-      setStatusTip('', '');
-      applyAddress();
-    });
+    document.getElementById('applyBtn').addEventListener('click', applyAddress);
 
     document.getElementById('fillSampleBtn').addEventListener('click', () => {
       receiverInput.value = '详细地址联系客服';
       phoneInput.value = '18888888888';
       addressInput.value = '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
-      fullAddressInput.value = '收货人：详细地址联系客服\n手机号码：18888888888\n所在地区：新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县\n详细地址：宽店镇0';
-      setStatusTip('', '');
+      fullAddressInput.value = '收货人：详细地址联系客服 18888888888\n新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
       applyAddress();
     });
 
@@ -1001,31 +884,14 @@
       }
     });
 
-    document.getElementById('exportBtn').addEventListener('click', async () => {
-      applyAddress();
-      captureRoot.classList.add('shot-mode');
-      window.scrollTo(0, 0);
-      try {
-        const canvas = await html2canvas(captureRoot, {
-          useCORS: true,
-          backgroundColor: '#efefef',
-          scale: 2,
-          windowWidth: captureRoot.scrollWidth,
-          windowHeight: captureRoot.scrollHeight
-        });
-        const link = document.createElement('a');
-        link.download = '退货退款详情截图.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      } catch (err) {
-        alert('导出失败');
-      } finally {
-        captureRoot.classList.remove('shot-mode');
-      }
-    });
+    document.getElementById('exportBtn').addEventListener('click', exportScreenshot);
+
+    window.addEventListener('resize', updateStageScale);
+    window.addEventListener('orientationchange', () => setTimeout(updateStageScale, 120));
 
     randomCountdown();
     applyAddress();
+    updateStageScale();
   </script>
 </body>
 </html>
