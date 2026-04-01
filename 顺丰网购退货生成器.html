@@ -1,352 +1,1031 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>退货申请</title>
-    <!-- 适配 iPhone（宽度按 430px 设计，接近 iPhone 16 Pro Max 逻辑宽度） -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>退货退款详情</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #efefef;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: #222;
+    }
 
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: #f5f5f5;
-        }
-        .container {
-            max-width: 430px;          /* ① 以 iPhone 16 宽度为参考 */
-            margin: 30px auto;
-            padding: 0 12px;
-        }
-        .top-tools {
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 10px;
-            gap: 10px;
-        }
-        .tool-btn {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px 10px;
-            background: #fafafa;
-            font-size: 13px;
-            cursor: pointer;
-        }
+    :root {
+      --phone-width: 828px;
+      --red: #ff0036;
+      --orange: #ff6a00;
+      --light-gray: #efefef;
+      --text-gray: #9f9f9f;
+      --border-gray: #b9b9b9;
+    }
 
-        /* 去掉外层红色大框，只保留卡片样式 */
-        .card {
-            background: #fff;
-            border-radius: 10px;
-            padding: 18px 14px 22px;
-            box-shadow: 0 4px 10px rgba(0,0,0,.04);
-        }
+    body {
+      display: flex;
+      justify-content: center;
+    }
 
-        .steps {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 18px;
-            color: #888;
-        }
-        .step-active {
-            color: #00b578;
-            font-weight: 600;
-        }
-        h3 {
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-        .deadline {
-            text-align: center;
-            font-size: 13px;
-            color: #999;
-            margin-bottom: 16px;
-        }
+    .phone {
+      width: 100%;
+      max-width: var(--phone-width);
+      min-height: 100vh;
+      background: var(--light-gray);
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        .return-methods {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-        .method {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-            padding: 9px 6px;
-            font-size: 15px;
-            cursor: pointer;
-        }
-        .method-desc {
-            margin-top: 4px;
-            font-size: 12px;
-            color: #999;
-        }
-        .method.active {
-            border-color: #ff7d00;
-            background: #fff7eb;
-            color: #ff7d00;
-        }
+    .status-bar {
+      height: 84px;
+      background: var(--red);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-weight: 600;
+    }
 
-        .notice {
-            background: #fff7eb;
-            color: #ff7d00;
-            font-size: 13px;
-            padding: 8px 9px;
-            border-radius: 4px;
-            margin-bottom: 14px;
-        }
+    .status-left {
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .helper-block-title {
-            font-size: 13px;
-            margin-bottom: 4px;
-            color: #555;
-        }
-        .helper-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .helper-textarea {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 7px 8px;
-            font-size: 13px;
-            resize: vertical;
-            min-height: 50px;
-        }
-        .helper-btn {
-            width: 86px;
-            border-radius: 4px;
-            border: none;
-            background: #ff7d00;
-            color: #fff;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .helper-tip {
-            font-size: 12px;
-            color: #999;
-            margin-top: -6px;
-            margin-bottom: 10px;
-        }
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+    }
 
-        .address-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-        .copy-btn {
-            color: #ff7d00;
-            cursor: pointer;
-        }
+    .pill-battery {
+      border: 2px solid rgba(255,255,255,0.95);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 14px;
+      line-height: 1.2;
+    }
 
-        .textarea, .input {
-            width: 100%;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            padding: 8px 9px;
-            font-size: 14px;
-        }
-        .textarea {
-            resize: none;
-            height: 56px;
-            margin-bottom: 10px;
-        }
-        .input {
-            margin-bottom: 16px;
-        }
+    .topbar {
+      height: 86px;
+      background: var(--red);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
 
-        .submit-btn {
-            width: 100%;
-            padding: 10px 0;
-            background: #222;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 14px;
-        }
+    .topbar-left,
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      min-width: 170px;
+    }
 
-        .bottom-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-        .bottom-row span {
-            color: #ff7d00;
-        }
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-        .action-btn {
-            flex: 1;
-            padding: 8px 0;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            background: #fff;
-            cursor: pointer;
-        }
-    </style>
+    .topbar-right {
+      justify-content: flex-end;
+      position: relative;
+    }
+
+    .back {
+      font-size: 42px;
+      line-height: 1;
+      margin-top: -2px;
+    }
+
+    .title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .icon {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      opacity: 0.98;
+      flex: 0 0 auto;
+    }
+
+    .icon.refresh {
+      border: 3px solid transparent;
+      border-top-color: #fff;
+      border-right-color: #fff;
+      border-radius: 50%;
+      transform: rotate(35deg);
+    }
+    .icon.refresh::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 2px;
+      border-left: 9px solid #fff;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      transform: rotate(18deg);
+    }
+
+    .icon.share::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 9px;
+      width: 18px;
+      height: 18px;
+      border: 3px solid #fff;
+      border-left: 0;
+      border-bottom: 0;
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+    .icon.share::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 4px;
+      width: 3px;
+      height: 24px;
+      background: #fff;
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+
+    .icon.more {
+      width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .icon.more::before,
+    .icon.more::after,
+    .icon.more span {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: #fff;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .badge {
+      position: absolute;
+      right: -10px;
+      top: -10px;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 18px;
+      background: #ffa52c;
+      color: #fff;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .content {
+      padding: 14px 12px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 26px;
+      padding: 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
+    }
+
+    .timeline-card {
+      position: relative;
+      padding-left: 70px;
+      padding-bottom: 24px;
+    }
+
+    .timeline {
+      position: absolute;
+      left: 35px;
+      top: 40px;
+      bottom: 34px;
+      width: 2px;
+      background: #d7d7d7;
+    }
+
+    .dot {
+      position: absolute;
+      left: 25px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #d97a2a;
+    }
+
+    .dot.top { top: 30px; }
+    .dot.active {
+      top: 148px;
+      width: 24px;
+      height: 24px;
+      left: 24px;
+      background: #ff6a00;
+      border: 0;
+    }
+    .dot.bottom {
+      bottom: 16px;
+      width: 20px;
+      height: 20px;
+      left: 26px;
+      background: #cfcfcf;
+      border: 0;
+    }
+
+    .step-small {
+      font-size: 22px;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 54px;
+    }
+
+    .step-title-line {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .step-title {
+      font-size: 28px;
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .countdown {
+      font-size: 20px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      font-size: 24px;
+      color: #ea7a26;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .desc {
+      font-size: 22px;
+      line-height: 1.55;
+      color: var(--text-gray);
+      margin: 4px 0;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+    }
+
+    .footer-label {
+      font-size: 22px;
+      color: #7c7c7c;
+      font-weight: 500;
+    }
+
+    .process-link {
+      font-size: 22px;
+      color: #111;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .arrow {
+      color: #a8a8a8;
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .receiver-row {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .receiver-phone {
+      color: #9b9b9b;
+      font-weight: 500;
+    }
+
+    .address {
+      font-size: 22px;
+      line-height: 1.55;
+      color: #333;
+      word-break: break-all;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .copy {
+      color: #f17f1d;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .service-box {
+      margin-top: 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .service-left h3 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #222;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 26px;
+      padding: 0 10px;
+      background: #ffb338;
+      color: #fff;
+      border-radius: 13px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .service-desc {
+      font-size: 20px;
+      color: #ea7a26;
+      line-height: 1.5;
+      font-weight: 500;
+      max-width: 340px;
+    }
+
+    .primary-btn {
+      border: 0;
+      background: linear-gradient(180deg, #ff8a00, #ff7600);
+      color: #fff;
+      min-width: 270px;
+      height: 82px;
+      border-radius: 41px;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sent-row {
+      margin-top: 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    .sent-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .sent-sub {
+      font-size: 20px;
+      color: #a0a0a0;
+    }
+
+    .outline-btn {
+      min-width: 236px;
+      height: 76px;
+      border-radius: 38px;
+      border: 2px solid #a8a8a8;
+      background: #fff;
+      color: #666;
+      font-size: 22px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .service-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 22px;
+      line-height: 1.5;
+      gap: 16px;
+    }
+
+    .service-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .date-right {
+      color: #222;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .bottom-actions {
+      padding: 8px 20px 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      background: var(--light-gray);
+    }
+
+    .ghost-btn {
+      height: 62px;
+      padding: 0 28px;
+      border-radius: 31px;
+      background: #fff;
+      border: 2px solid var(--border-gray);
+      color: #333;
+      font-size: 18px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .nav-bar {
+      height: 84px;
+      background: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      color: #c8c8c8;
+      font-size: 32px;
+      padding-bottom: 8px;
+    }
+
+    .editor-panel {
+      background: #fff;
+      margin: 0 12px 14px;
+      border-radius: 26px;
+      padding: 22px 20px 20px;
+    }
+
+    .editor-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .hint {
+      font-size: 16px;
+      color: #888;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .status-tip {
+      font-size: 15px;
+      margin-bottom: 14px;
+      line-height: 1.4;
+      color: #666;
+      min-height: 21px;
+    }
+
+    .status-tip.high { color: #1f8f45; }
+    .status-tip.medium { color: #d68a00; }
+    .status-tip.low { color: #d14343; }
+
+    .textarea,
+    .input {
+      width: 100%;
+      border: 1.5px solid #ddd;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 18px;
+      outline: none;
+      background: #fff;
+      margin-bottom: 12px;
+      font-family: inherit;
+    }
+
+    .textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .small-btn {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 23px;
+      border: 0;
+      background: #ff7b00;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .small-btn.secondary {
+      background: #f3f3f3;
+      color: #333;
+      border: 1px solid #d9d9d9;
+    }
+
+    .hide-on-shot {
+      display: block;
+    }
+
+    @media (max-width: 828px) {
+      .phone { max-width: 100vw; }
+    }
+
+    @media (max-width: 700px) {
+      .status-bar { height: 56px; padding: 0 16px; }
+      .status-left { font-size: 20px; }
+      .topbar { height: 64px; }
+      .title { font-size: 22px; }
+      .topbar-left, .topbar-right { min-width: 108px; gap: 14px; }
+      .back { font-size: 32px; }
+      .icon { width: 28px; height: 28px; }
+      .badge { min-width: 24px; height: 24px; font-size: 12px; }
+      .content { padding: 10px 10px 14px; }
+      .card, .editor-panel { border-radius: 18px; padding: 20px 18px; margin-left: 10px; margin-right: 10px; }
+      .timeline-card { padding-left: 54px; }
+      .timeline { left: 24px; top: 30px; bottom: 28px; }
+      .dot { left: 16px; width: 16px; height: 16px; }
+      .dot.active { left: 15px; top: 112px; width: 18px; height: 18px; }
+      .dot.bottom { left: 17px; width: 15px; height: 15px; }
+      .step-small, .footer-label, .process-link, .receiver-row, .service-title, .service-row, .date-right, .sent-title { font-size: 18px; }
+      .step-title { font-size: 22px; }
+      .countdown, .subtitle, .desc, .address, .service-left h3, .service-desc, .sent-sub { font-size: 16px; }
+      .primary-btn { min-width: 170px; height: 56px; font-size: 18px; }
+      .outline-btn { min-width: 150px; height: 52px; font-size: 18px; }
+      .bottom-actions { padding: 8px 12px 18px; }
+      .ghost-btn { height: 48px; padding: 0 20px; font-size: 15px; }
+      .nav-bar { height: 62px; font-size: 24px; }
+      .input, .textarea { font-size: 16px; }
+      .mini-grid { grid-template-columns: 1fr; }
+    }
+
+    .shot-mode .hide-on-shot {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-
-    <div class="top-tools">
-        <button class="tool-btn" id="resetBtn">重置内容</button>
+  <div class="phone" id="captureRoot">
+    <div class="status-bar">
+      <div class="status-left">5:25 <span style="font-size:16px;opacity:.9;">淘</span> <span style="font-size:16px;opacity:.9;">🛍</span></div>
+      <div class="status-icons">
+        <span>◔</span>
+        <span>⏰</span>
+        <span>◔</span>
+        <span style="font-size:18px;">4G</span>
+        <span>▮▮▮</span>
+        <span class="pill-battery">100</span>
+      </div>
     </div>
 
-    <div class="card">
-        <!-- 步骤条 -->
-        <div class="steps">
-            <div class="step-active">● 商家处理</div>
-            <div>2 寄回商品</div>
-            <div>3 退款结束</div>
-        </div>
-
-        <h3>请选择退货方式</h3>
-        <div class="deadline">6天23时59分后未寄出将撤销退货申请</div>
-
-        <!-- 退货方式 -->
-        <div class="return-methods" id="methods">
-            <div class="method">
-                上门取件
-                <div class="method-desc">快递员上门取包裹</div>
-            </div>
-            <div class="method">
-                驿站自寄
-                <div class="method-desc">免费包装</div>
-            </div>
-            <div class="method active">
-                自行寄回
-                <div class="method-desc">需填写单号</div>
-            </div>
-        </div>
-
-        <div class="notice">
-            需您自行联系快递公司退回，请不要邮寄到付
-        </div>
-
-        <!-- ③ 一键识别整段地址 + 手机号 + 姓名 -->
-        <div class="helper-block-title">整段地址识别（包含姓名 + 手机号 + 地址）</div>
-        <div class="helper-row">
-            <textarea id="rawInfo" class="helper-textarea"
-                      placeholder="示例：张三 13812345678 上海市浦东新区川沙新镇××××"></textarea>
-            <button class="helper-btn" id="parseBtn">一键识别</button>
-        </div>
-        <div class="helper-tip">
-            默认按“姓名 手机号 地址”的顺序识别，如格式特别乱，识别后再手动微调。
-        </div>
-
-        <!-- 商家地址 -->
-        <div class="address-header">
-            <span>商家地址</span>
-            <span class="copy-btn" id="copyAddr">复制地址</span>
-        </div>
-        <textarea id="addr" class="textarea"
-                  placeholder="请输入商家地址（例：天津市河北区鸿顺里街道××）"></textarea>
-        <input id="contact" class="input"
-               placeholder="请输入商家姓名和电话（例：张三，13800000000）">
-
-        <button class="submit-btn">填写单号</button>
-
-        <div class="bottom-row">
-            <div>商品图占位</div>
-            <span>退货包运费</span>
-        </div>
-
-        <div class="actions">
-            <button class="action-btn">平台介入</button>
-            <button class="action-btn">撤销申请</button>
-        </div>
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="back">←</div>
+      </div>
+      <div class="title">退货退款详情</div>
+      <div class="topbar-right">
+        <div class="icon refresh"></div>
+        <div class="icon share"></div>
+        <div class="icon more"><span></span></div>
+        <div class="badge">57</div>
+      </div>
     </div>
-</div>
 
-<script>
-    // 切换退货方式高亮
-    const methods = document.querySelectorAll('#methods .method');
-    methods.forEach(m => {
-        m.addEventListener('click', () => {
-            methods.forEach(x => x.classList.remove('active'));
-            m.classList.add('active');
-        });
+    <div class="editor-panel hide-on-shot">
+      <div class="editor-title">地址录入</div>
+      <div class="hint">支持格式：标签型、多行、地址+姓名+电话、姓名+电话+地址、无空格连写、单个姓、电话带分机。</div>
+      <div class="status-tip" id="statusTip"></div>
+      <textarea id="fullAddressInput" class="textarea" placeholder="整段粘贴示例：
+收货人：张三
+手机号码：18888888888
+所在地区：新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县
+详细地址：宽店镇0"></textarea>
+      <div class="mini-grid">
+        <input id="receiverInput" class="input" placeholder="收货人" value="详细地址联系客服" />
+        <input id="phoneInput" class="input" placeholder="手机号/分机" value="18888888888" />
+      </div>
+      <textarea id="addressInput" class="textarea" placeholder="详细地址">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</textarea>
+      <div class="editor-actions">
+        <button class="small-btn" id="parseBtn">粘贴并识别</button>
+        <button class="small-btn secondary" id="applyBtn">应用到页面</button>
+        <button class="small-btn secondary" id="fillSampleBtn">恢复示例</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card timeline-card">
+        <div class="timeline"></div>
+        <div class="dot top"></div>
+        <div class="dot active"></div>
+        <div class="dot bottom"></div>
+
+        <div class="step-small">商家处理</div>
+
+        <div class="step-title-line">
+          <div class="step-title">寄回商品</div>
+          <div class="countdown" id="countdownText">还剩6天23时59分</div>
+        </div>
+
+        <div class="subtitle">请退货并填写物流信息</div>
+        <div class="desc">未与商家协商一致，请勿使用到付或平邮，以免商家拒签货物</div>
+        <div class="desc">交易的钱款还在天猫中间账户，确保您资金安全</div>
+        <div class="desc">请填写真实退货物流信息，逾期未填写，退货申请将关闭</div>
+        <div class="desc">平台支持您的退款申请。</div>
+
+        <div class="footer-row">
+          <div class="footer-label">商家退款</div>
+          <div class="process-link">全部流程 <span class="arrow">›</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="receiver-row">
+          <span>收货人：</span>
+          <span id="receiverText">详细地址联系客服</span>
+          <span class="receiver-phone" id="phoneText">18888888888</span>
+        </div>
+        <div class="address">
+          <span id="addressText">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</span>
+          <span class="copy" id="copyBtn">复制</span>
+        </div>
+
+        <div class="service-box">
+          <div class="service-left">
+            <h3>官方推荐寄件服务 <span class="tag">一键退货</span></h3>
+            <div class="service-desc">大件专属服务，3公斤以上更划算，丢损必赔</div>
+          </div>
+          <button class="primary-btn">我要寄件</button>
+        </div>
+
+        <div class="sent-row">
+          <div>
+            <div class="sent-title">我已寄出</div>
+            <div class="sent-sub">点击填写物流单号</div>
+          </div>
+          <button class="outline-btn">填写单号</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="service-title">我的服务</div>
+        <div class="service-row">
+          <div>7天无理由退换</div>
+          <div class="date-right">11月16日24点前可享 <span class="arrow">›</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="ghost-btn">平台介入</button>
+      <button class="ghost-btn" id="exportBtn">撤销申请</button>
+    </div>
+
+    <div class="nav-bar">
+      <span>□</span>
+      <span>○</span>
+      <span>△</span>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const receiverInput = document.getElementById('receiverInput');
+    const phoneInput = document.getElementById('phoneInput');
+    const addressInput = document.getElementById('addressInput');
+    const fullAddressInput = document.getElementById('fullAddressInput');
+
+    const receiverText = document.getElementById('receiverText');
+    const phoneText = document.getElementById('phoneText');
+    const addressText = document.getElementById('addressText');
+    const countdownText = document.getElementById('countdownText');
+    const captureRoot = document.getElementById('captureRoot');
+    const statusTip = document.getElementById('statusTip');
+
+    function randomCountdown() {
+      const maxMinutes = 6 * 24 * 60 + 23 * 60 + 59;
+      const total = Math.floor(Math.random() * maxMinutes) + 1;
+      const days = Math.floor(total / (24 * 60));
+      const hours = Math.floor((total % (24 * 60)) / 60);
+      const minutes = total % 60;
+      countdownText.textContent = `还剩${days}天${hours}时${minutes}分`;
+    }
+
+    function applyAddress() {
+      receiverText.textContent = receiverInput.value.trim() || '详细地址联系客服';
+      phoneText.textContent = phoneInput.value.trim() || '18888888888';
+      addressText.textContent = addressInput.value.trim() || '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
+    }
+
+    function setStatusTip(level, text) {
+      statusTip.className = 'status-tip';
+      if (level) statusTip.classList.add(level);
+      statusTip.textContent = text || '';
+    }
+
+    function normalizeText(text) {
+      return text
+        .replace(/\r/g, '\n')
+        .replace(/[：:]/g, '：')
+        .replace(/[，,;；|｜]/g, ' ')
+        .replace(/\u00A0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function escapeRegExp(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function extractPhone(text) {
+      const m = text.match(/1\d{10}(?:-\d{1,6})?/);
+      return m ? m[0] : '';
+    }
+
+    function extractLabeledFields(text) {
+      const out = {
+        receiver: '',
+        phone: '',
+        region: '',
+        detail: '',
+        address: ''
+      };
+
+      const receiver = text.match(/(?:收货人|收件人|联系人)\s*：\s*([^\s]+?)(?=\s+(?:手机号码|手机号|电话|所在地区|详细地址|地址)|$)/);
+      if (receiver) out.receiver = receiver[1].trim();
+
+      const phone = text.match(/(?:手机号码|手机号|电话)\s*：\s*(1\d{10}(?:-\d{1,6})?)/);
+      if (phone) out.phone = phone[1].trim();
+
+      const region = text.match(/所在地区\s*：\s*(.+?)(?=\s*(?:详细地址|地址)\s*：|$)/);
+      if (region) out.region = region[1].trim();
+
+      const detail = text.match(/(?:详细地址|地址)\s*：\s*(.+)$/);
+      if (detail) out.detail = detail[1].trim();
+
+      out.address = [out.region, out.detail].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+      return out;
+    }
+
+    function looksLikeName(token) {
+      if (!token) return false;
+      const t = token.trim();
+      if (!/^[\u4e00-\u9fa5·]{1,6}$/.test(t)) return false;
+      if (/^(收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址|地区)$/.test(t)) return false;
+      if (/(省|市|区|县|镇|乡|街道|街|路|道|巷|弄|号|栋|幢|座|单元|室|楼|广场|大厦|小区|花园|公寓|村|组|苑|城|湾|府|里|庭|园区|工业园|开发区)$/.test(t)) return false;
+      if (/^(北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|台湾|内蒙古|广西|西藏|宁夏|新疆|香港|澳门)/.test(t)) return false;
+      return true;
+    }
+
+    function cleanAddressNoise(text) {
+      return text
+        .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址)\s*：?/g, ' ')
+        .replace(/^码\s*[:：]?\s*/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function guessReceiverAndAddress(text, phone, fallbackReceiver) {
+      let receiver = fallbackReceiver || '';
+      let address = '';
+
+      let working = cleanAddressNoise(text);
+      if (phone) working = working.replace(new RegExp(escapeRegExp(phone), 'g'), ' ');
+      working = working.replace(/\s+/g, ' ').trim();
+
+      const tokens = working.split(/\s+/).filter(Boolean);
+      const compact = working.replace(/\s+/g, '');
+      const addressKeywords = /省|市|区|县|镇|乡|街道|街|路|道|巷|弄|号|栋|幢|座|单元|室|楼|广场|大厦|小区|花园|公寓|村|组|苑|城|湾|府|里|庭|园区|工业园|开发区/;
+
+      if (!receiver) {
+        for (let i = tokens.length - 1; i >= 0; i--) {
+          if (looksLikeName(tokens[i])) {
+            receiver = tokens[i];
+            break;
+          }
+        }
+      }
+
+      if (!receiver) {
+        for (let len = 4; len >= 1; len--) {
+          const tail = compact.slice(-len);
+          const prefix = compact.slice(0, -len);
+          if (looksLikeName(tail) && addressKeywords.test(prefix)) {
+            receiver = tail;
+            break;
+          }
+        }
+      }
+
+      if (!receiver && phone) {
+        const dense = normalizeText(text).replace(/\s+/g, '');
+        const idx = dense.indexOf(phone);
+
+        if (idx >= 0) {
+          const left = dense
+            .slice(0, idx)
+            .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址|：)/g, '');
+
+          const right = dense
+            .slice(idx + phone.length)
+            .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址|：)/g, '');
+
+          for (let len = 4; len >= 1; len--) {
+            const leftTail = left.slice(-len);
+            const leftPrefix = left.slice(0, -len);
+            if (looksLikeName(leftTail) && addressKeywords.test(leftPrefix)) {
+              receiver = leftTail;
+              address = (leftPrefix + right).trim();
+              break;
+            }
+          }
+
+          if (!receiver) {
+            for (let len = 4; len >= 1; len--) {
+              const rightHead = right.slice(0, len);
+              const rightRest = right.slice(len);
+              if (looksLikeName(rightHead) && addressKeywords.test(rightRest)) {
+                receiver = rightHead;
+                address = (left + rightRest).trim();
+                break;
+              }
+            }
+          }
+
+          if (!receiver && looksLikeName(left)) {
+            receiver = left;
+            address = right;
+          }
+        }
+      }
+
+      if (!address) {
+        address = working;
+        if (receiver) {
+          address = address
+            .replace(new RegExp('^' + escapeRegExp(receiver)), '')
+            .replace(new RegExp(escapeRegExp(receiver) + '$'), '')
+            .trim();
+        }
+      }
+
+      address = cleanAddressNoise(address);
+      return { receiver, address };
+    }
+
+    function scoreResult(normalized, result) {
+      let score = 0;
+
+      if (result.phone) score += 35;
+      if (result.receiver && result.receiver !== '详细地址联系客服') score += 25;
+      if (result.address) score += 25;
+
+      if (/(收货人|收件人|联系人)\s*：/.test(normalized) && result.receiver) score += 10;
+      if (/(手机号码|手机号|电话)\s*：/.test(normalized) && result.phone) score += 10;
+      if (/(所在地区|详细地址|地址)\s*：/.test(normalized) && result.address) score += 10;
+
+      if (result.receiver && looksLikeName(result.receiver)) score += 5;
+      if (result.address && /省|市|区|县|镇|乡|街道|路|号|栋|单元|室|小区|花园|公寓|村/.test(result.address)) score += 10;
+
+      if (result.address && /^码[:：]/.test(result.address)) score -= 20;
+      if (result.address && /^(手机号码|手机号|电话|所在地区|详细地址|地址)[:：]/.test(result.address)) score -= 15;
+
+      if (score >= 85) return { level: 'high', text: '高置信度：已自动识别。' };
+      if (score >= 60) return { level: 'medium', text: '中置信度：建议检查姓名和地址。' };
+      return { level: 'low', text: '低置信度：请手动检查后再导出截图。' };
+    }
+
+    function parseAddressSmart(raw) {
+      const normalized = normalizeText(raw);
+      const labeled = extractLabeledFields(normalized);
+      const phone = labeled.phone || extractPhone(normalized);
+      const guessed = guessReceiverAndAddress(normalized, phone, labeled.receiver);
+
+      const result = {
+        receiver: labeled.receiver || guessed.receiver,
+        phone,
+        address: labeled.address || guessed.address
+      };
+
+      result.confidence = scoreResult(normalized, result);
+      return result;
+    }
+
+    function parseCombinedText(raw) {
+      const text = raw.trim();
+      if (!text) {
+        setStatusTip('low', '请输入要识别的地址信息。');
+        return;
+      }
+
+      const result = parseAddressSmart(text);
+
+      receiverInput.value = result.receiver || '详细地址联系客服';
+      phoneInput.value = result.phone || phoneInput.value.trim() || '18888888888';
+      addressInput.value = result.address || addressInput.value.trim() || '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
+
+      setStatusTip(result.confidence.level, result.confidence.text);
+      applyAddress();
+    }
+
+    document.getElementById('parseBtn').addEventListener('click', () => {
+      parseCombinedText(fullAddressInput.value);
     });
 
-    // 重置
-    document.getElementById('resetBtn').onclick = () => {
-        document.getElementById('addr').value = '';
-        document.getElementById('contact').value = '';
-        document.getElementById('rawInfo').value = '';
-    };
+    document.getElementById('applyBtn').addEventListener('click', () => {
+      setStatusTip('', '');
+      applyAddress();
+    });
 
-    // 复制地址
-    document.getElementById('copyAddr').onclick = async () => {
-        const addr = document.getElementById('addr').value.trim();
-        if (!addr) { alert('请先填写地址再复制'); return; }
-        try {
-            await navigator.clipboard.writeText(addr);
-            alert('地址已复制');
-        } catch (e) {
-            alert('复制失败，请手动选择复制');
-        }
-    };
+    document.getElementById('fillSampleBtn').addEventListener('click', () => {
+      receiverInput.value = '详细地址联系客服';
+      phoneInput.value = '18888888888';
+      addressInput.value = '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
+      fullAddressInput.value = '收货人：详细地址联系客服\n手机号码：18888888888\n所在地区：新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县\n详细地址：宽店镇0';
+      setStatusTip('', '');
+      applyAddress();
+    });
 
-    // ③ 一键识别整段地址：默认格式「姓名 手机号 地址」
-    document.getElementById('parseBtn').onclick = () => {
-        let raw = document.getElementById('rawInfo').value.trim();
-        if (!raw) {
-            alert('请先粘贴整段地址信息');
-            return;
-        }
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const text = `收货人：${receiverText.textContent} ${phoneText.textContent}\n${addressText.textContent}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById('copyBtn');
+        const old = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(() => btn.textContent = old, 1200);
+      } catch (e) {
+        alert('复制失败，请手动复制');
+      }
+    });
 
-        // 去掉多余空白，统一成一个空格分隔
-        raw = raw.replace(/\s+/g, ' ');
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+      applyAddress();
+      captureRoot.classList.add('shot-mode');
+      window.scrollTo(0, 0);
+      try {
+        const canvas = await html2canvas(captureRoot, {
+          useCORS: true,
+          backgroundColor: '#efefef',
+          scale: 2,
+          windowWidth: captureRoot.scrollWidth,
+          windowHeight: captureRoot.scrollHeight
+        });
+        const link = document.createElement('a');
+        link.download = '退货退款详情截图.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        alert('导出失败');
+      } finally {
+        captureRoot.classList.remove('shot-mode');
+      }
+    });
 
-        // 手机号：大陆 11 位，以 1 开头
-        const phoneMatch = raw.match(/1[3-9]\d{9}/);
-        if (!phoneMatch) {
-            alert('未识别到 11 位手机号码，请检查格式');
-            return;
-        }
-        const phone = phoneMatch[0];
-
-        // 按手机号拆分成「前」「后」两部分
-        const parts = raw.split(phone);
-        const before = (parts[0] || '').trim();
-        const after  = (parts[1] || '').trim();
-
-        // 简单规则：默认“姓名 手机号 地址”
-        // -> before 里取最后 2~4 个中文作为姓名，其余全部视为前缀（通常没有地址）
-        let name = before;
-        // 只保留中文和常见符号，尽量防止乱七八糟的内容
-        name = name.replace(/[^一-龥·\.]/g, '');
-        if (name.length > 4) {
-            name = name.slice(-3);  // 超过 4 个字符，就取最后 3 个当姓名
-        }
-
-        // 地址：优先用手机号后的部分
-        let addr = after || '';
-        addr = addr.replace(/[,，。;；]/g, '').trim();
-
-        // 回填
-        if (addr) {
-            document.getElementById('addr').value = addr;
-        }
-        document.getElementById('contact').value = name
-            ? `${name}，${phone}`
-            : phone;
-
-        if (!addr) {
-            alert('已识别姓名和手机号，地址请手动补全或调整。');
-        }
-    };
-</script>
+    randomCountdown();
+    applyAddress();
+  </script>
 </body>
 </html>
