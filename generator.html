@@ -777,18 +777,14 @@
       const signals = ['▮▮▮', '▮▮▮', '▮▮', '▮▮▮'];
       document.getElementById('statusSignal').textContent = signals[Math.floor(Math.random() * signals.length)];
 
-      const maxMin = 6 * 24 * 60 + 23 * 60 + 59;
-      const total = Math.floor(Math.random() * maxMin) + 1;
-      const days = Math.floor(total / (24 * 60));
-      const hours = Math.floor((total % (24 * 60)) / 60);
-      const minutes = total % 60;
-      countdownText.textContent = `还剩${days}天${hours}时${minutes}分`;
+      const bjNow = new Date(Date.now() + 8 * 3600000);
+      const addDays = Math.floor(Math.random() * 6) + 2;
+      const target = new Date(Date.UTC(bjNow.getUTCFullYear(), bjNow.getUTCMonth(), bjNow.getUTCDate() + addDays));
+      document.getElementById('serviceDateText').innerHTML = `${target.getUTCMonth() + 1}月${target.getUTCDate()}日24点前可享 <span class="arrow">›</span>`;
 
-      const now = new Date();
-      const futureDay = new Date(now.getTime() + (Math.floor(Math.random() * 10) + 3) * 86400000);
-      const month = futureDay.getMonth() + 1;
-      const day = futureDay.getDate();
-      document.getElementById('serviceDateText').innerHTML = `${month}月${day}日24点前可享 <span class="arrow">›</span>`;
+      const deadlineMs = Date.UTC(bjNow.getUTCFullYear(), bjNow.getUTCMonth(), bjNow.getUTCDate() + addDays + 1) - 8 * 3600000;
+      const remain = Math.max(0, deadlineMs - Date.now());
+      countdownText.textContent = `还剩${Math.floor(remain / 86400000)}天${Math.floor((remain % 86400000) / 3600000)}时${Math.floor((remain % 3600000) / 60000)}分`;
     }
 
     function applyAddress() {
