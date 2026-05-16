@@ -28,10 +28,92 @@
 
     body {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       background: #efefef;
     }
 
+    /* ── Editor panel (outside phone, always visible) ── */
+    .editor-panel {
+      width: 100%;
+      max-width: 828px;
+      background: #fff;
+      border-radius: 0 0 20px 20px;
+      padding: 16px 18px 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .editor-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .textarea, .input {
+      width: 100%;
+      border: 1.5px solid #ddd;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+      margin-bottom: 8px;
+      font-family: inherit;
+    }
+
+    .textarea {
+      min-height: 70px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .small-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 20px;
+      border: 0;
+      background: #ff7b00;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .small-btn.secondary {
+      background: #f3f3f3;
+      color: #333;
+      border: 1px solid #d9d9d9;
+    }
+
+    .small-btn.export-btn {
+      background: linear-gradient(135deg, #ff8a00, #ff5500);
+      margin-left: auto;
+    }
+
+    /* ── Phone preview ── */
     .page-shell {
       width: 100%;
       max-width: 100vw;
@@ -44,12 +126,12 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      min-height: 100vh;
+      min-height: 0;
+      padding: 10px 0;
     }
 
     .phone {
       width: var(--phone-width);
-      min-height: 100vh;
       background: var(--light-gray);
       position: relative;
       overflow-x: hidden;
@@ -336,7 +418,7 @@
     }
 
     .receiver-row {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
       line-height: 1.4;
       margin-bottom: 10px;
@@ -347,14 +429,14 @@
     }
 
     .receiver-phone {
-      color: #9b9b9b;
-      font-weight: 500;
+      color: #555;
+      font-weight: 600;
     }
 
     .address {
-      font-size: 22px;
+      font-size: 24px;
       line-height: 1.55;
-      color: #333;
+      color: #222;
       word-break: break-all;
       display: flex;
       flex-wrap: wrap;
@@ -370,7 +452,9 @@
     }
 
     .service-box {
-      margin-top: 26px;
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid #e8e8e8;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -504,80 +588,6 @@
       padding-bottom: 8px;
     }
 
-    .editor-panel {
-      background: #fff;
-      margin: 0 12px 14px;
-      border-radius: 26px;
-      padding: 22px 20px 20px;
-    }
-
-    .editor-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-
-    .hint {
-      font-size: 16px;
-      color: #888;
-      line-height: 1.5;
-      margin-bottom: 14px;
-    }
-
-    .textarea,
-    .input {
-      width: 100%;
-      border: 1.5px solid #ddd;
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-size: 18px;
-      outline: none;
-      background: #fff;
-      margin-bottom: 12px;
-      font-family: inherit;
-    }
-
-    .textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-
-    .mini-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .editor-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-
-    .small-btn {
-      height: 46px;
-      padding: 0 16px;
-      border-radius: 23px;
-      border: 0;
-      background: #ff7b00;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .small-btn.secondary {
-      background: #f3f3f3;
-      color: #333;
-      border: 1px solid #d9d9d9;
-    }
-
-    .hide-on-shot {
-      display: block;
-    }
-
     .export-clone {
       position: fixed;
       left: -99999px;
@@ -594,24 +604,50 @@
       min-height: auto !important;
     }
 
-    .phone.exporting .hide-on-shot {
-      display: none !important;
+    .phone.exporting .receiver-row,
+    .phone.exporting .receiver-phone,
+    .phone.exporting .address {
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+
+    .phone.exporting .receiver-phone {
+      color: #444 !important;
     }
   </style>
 </head>
 <body>
+
+  <!-- Editor (outside phone, sticky top) -->
+  <div class="editor-panel">
+    <div class="editor-title">地址录入</div>
+    <textarea id="fullAddressInput" class="textarea" placeholder="整段粘贴示例：&#10;收货人：张三 18888888888&#10;新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0"></textarea>
+    <div class="mini-grid">
+      <input id="receiverInput" class="input" placeholder="收货人" value="详细地址联系客服" />
+      <input id="phoneInput" class="input" placeholder="手机号" value="18888888888" />
+    </div>
+    <textarea id="addressInput" class="textarea" placeholder="详细地址" style="min-height:50px;">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</textarea>
+    <div class="editor-actions">
+      <button class="small-btn" id="parseBtn">粘贴并识别</button>
+      <button class="small-btn secondary" id="applyBtn">应用到页面</button>
+      <button class="small-btn secondary" id="fillSampleBtn">恢复示例</button>
+      <button class="small-btn export-btn" id="exportBtn">📷 导出截图</button>
+    </div>
+  </div>
+
+  <!-- Phone preview -->
   <div class="page-shell">
     <div class="scale-viewport" id="scaleViewport">
       <div class="phone" id="captureRoot">
         <div class="status-bar">
-          <div class="status-left">5:25 <span style="font-size:16px;opacity:.9;">淘</span> <span style="font-size:16px;opacity:.9;">🛍</span></div>
+          <div class="status-left"><span id="statusTime">5:25</span> <span style="font-size:16px;opacity:.9;">淘</span> <span style="font-size:16px;opacity:.9;">🛍</span></div>
           <div class="status-icons">
             <span>◔</span>
             <span>⏰</span>
             <span>◔</span>
-            <span style="font-size:18px;">4G</span>
-            <span>▮▮▮</span>
-            <span class="pill-battery">100</span>
+            <span style="font-size:18px;" id="statusNetwork">4G</span>
+            <span id="statusSignal">▮▮▮</span>
+            <span class="pill-battery" id="statusBattery">100</span>
           </div>
         </div>
 
@@ -624,23 +660,7 @@
             <div class="icon refresh"></div>
             <div class="icon share"></div>
             <div class="icon more"><span></span></div>
-            <div class="badge">57</div>
-          </div>
-        </div>
-
-        <div class="editor-panel hide-on-shot">
-          <div class="editor-title">地址录入</div>
-          <div class="hint">可手动填写，也可把整段地址直接粘贴到下方，一键拆分到对应位置。</div>
-          <textarea id="fullAddressInput" class="textarea" placeholder="整段粘贴示例：&#10;收货人：张三 18888888888&#10;新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0"></textarea>
-          <div class="mini-grid">
-            <input id="receiverInput" class="input" placeholder="收货人" value="详细地址联系客服" />
-            <input id="phoneInput" class="input" placeholder="手机号" value="18888888888" />
-          </div>
-          <textarea id="addressInput" class="textarea" placeholder="详细地址">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</textarea>
-          <div class="editor-actions">
-            <button class="small-btn" id="parseBtn">粘贴并识别</button>
-            <button class="small-btn secondary" id="applyBtn">应用到页面</button>
-            <button class="small-btn secondary" id="fillSampleBtn">恢复示例</button>
+            <div class="badge" id="statusBadge">57</div>
           </div>
         </div>
 
@@ -702,14 +722,14 @@
             <div class="service-title">我的服务</div>
             <div class="service-row">
               <div>7天无理由退换</div>
-              <div class="date-right">11月16日24点前可享 <span class="arrow">›</span></div>
+              <div class="date-right" id="serviceDateText">11月16日24点前可享 <span class="arrow">›</span></div>
             </div>
           </div>
         </div>
 
         <div class="bottom-actions">
           <button class="ghost-btn">平台介入</button>
-          <button class="ghost-btn" id="exportBtn">撤销申请</button>
+          <button class="ghost-btn">撤销申请</button>
         </div>
 
         <div class="nav-bar">
@@ -736,19 +756,39 @@
     const scaleViewport = document.getElementById('scaleViewport');
 
     function updateStageScale() {
-      const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const scale = Math.min(1, viewportWidth / 828);
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const scale = Math.min(1, vw / 828);
       document.documentElement.style.setProperty('--stage-scale', scale.toString());
       scaleViewport.style.height = `${captureRoot.scrollHeight * scale}px`;
     }
 
-    function randomCountdown() {
-      const maxMinutes = 6 * 24 * 60 + 23 * 60 + 59;
-      const total = Math.floor(Math.random() * maxMinutes) + 1;
+    function randomizeStatusBar() {
+      const h = Math.floor(Math.random() * 12) + 1;
+      const m = Math.floor(Math.random() * 60);
+      document.getElementById('statusTime').textContent = `${h}:${String(m).padStart(2, '0')}`;
+
+      document.getElementById('statusBattery').textContent = Math.floor(Math.random() * 71) + 30;
+
+      document.getElementById('statusBadge').textContent = Math.floor(Math.random() * 90) + 10;
+
+      const networks = ['4G', '5G', '4G', '5G'];
+      document.getElementById('statusNetwork').textContent = networks[Math.floor(Math.random() * networks.length)];
+
+      const signals = ['▮▮▮', '▮▮▮', '▮▮', '▮▮▮'];
+      document.getElementById('statusSignal').textContent = signals[Math.floor(Math.random() * signals.length)];
+
+      const maxMin = 6 * 24 * 60 + 23 * 60 + 59;
+      const total = Math.floor(Math.random() * maxMin) + 1;
       const days = Math.floor(total / (24 * 60));
       const hours = Math.floor((total % (24 * 60)) / 60);
       const minutes = total % 60;
       countdownText.textContent = `还剩${days}天${hours}时${minutes}分`;
+
+      const now = new Date();
+      const futureDay = new Date(now.getTime() + (Math.floor(Math.random() * 10) + 3) * 86400000);
+      const month = futureDay.getMonth() + 1;
+      const day = futureDay.getDate();
+      document.getElementById('serviceDateText').innerHTML = `${month}月${day}日24点前可享 <span class="arrow">›</span>`;
     }
 
     function applyAddress() {
@@ -762,59 +802,71 @@
       const text = raw.replace(/\r/g, '\n').trim();
       if (!text) return;
 
-      let receiver = '';
-      let phone = '';
-      let address = '';
+      const LABELS = /(?:收货人|收件人|联系人|姓名|名字|手机号码|手机号|联系电话|电话|手机|所在地区|收货地址|详细地址|地址|省市区|邮编)[:：\s]*/g;
+      const PROVINCES = '北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|台湾|内蒙古|广西|西藏|宁夏|新疆|香港|澳门';
+      const ADDR_TAIL = /(?:省|自治区|市|自治州|地区|盟|区|县|自治县|旗|镇|乡|街道|路|道|巷|弄|号|栋|幢|座|单元|室|楼|村|组|社区|小区|花园|苑|园|城|湾|庄|屯|营|堡|铺|大厦|广场|中心|工业园)/;
+      const NAME_RE = /^[一-龥·]{2,8}$/;
 
-      const joined = text.split(/\n+/).map(v => v.trim()).filter(Boolean).join(' ');
+      let joined = text.split(/\n+/).map(v => v.trim()).filter(Boolean).join(' ');
+      joined = joined.replace(LABELS, ' ').replace(/\s+/g, ' ').trim();
 
-      const phoneMatch = joined.match(/1\d{10}(?:-\d{1,6})?/);
-      if (phoneMatch) phone = phoneMatch[0];
+      let phone = '', receiver = '', address = '';
 
-      const receiverMatch = joined.match(/(?:收货人|收件人|联系人)[:：]?\s*([^\s]+)(?=\s|$)/);
-      if (receiverMatch) receiver = receiverMatch[1].trim();
-
-      const regionMatch = joined.match(/所在地区[:：]?\s*(.+?)(?=\s*(?:详细地址|地址)[:：]?|$)/);
-      const detailMatch = joined.match(/(?:详细地址|地址)[:：]?\s*(.+)$/);
-
-      if (regionMatch || detailMatch) {
-        address = [regionMatch ? regionMatch[1].trim() : '', detailMatch ? detailMatch[1].trim() : '']
-          .filter(Boolean)
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim();
+      const pm = joined.match(/1[3-9]\d[\s\-]?\d{4}[\s\-]?\d{4}/);
+      if (pm) {
+        phone = pm[0].replace(/[\s\-]/g, '');
+        joined = (joined.substring(0, pm.index) + ' ' + joined.substring(pm.index + pm[0].length)).replace(/\s+/g, ' ').trim();
       }
 
-      if (!receiver) {
-        const stripped = joined
-          .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址)[:：]?/g, ' ')
-          .replace(phone || '', ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-        const compact = stripped.replace(/\s+/g, '');
-        const tail = compact.match(/([\u4e00-\u9fa5·]{1,6})$/);
-        if (tail) {
-          const t = tail[1];
-          if (!/(省|市|区|县|镇|乡|街道|街|路|道|巷|弄|号|栋|幢|座|单元|室|楼)$/.test(t)) {
-            receiver = t;
+      const provRe = new RegExp('(' + PROVINCES + ')');
+      const provM = joined.match(provRe);
+
+      if (provM) {
+        const before = joined.substring(0, provM.index).trim();
+        const addrRaw = joined.substring(provM.index).trim();
+        receiver = pickName(before);
+        address = addrRaw;
+        if (!receiver) {
+          const trailing = stripTrailingName(addrRaw);
+          if (trailing) { receiver = trailing.name; address = trailing.addr; }
+        }
+      } else {
+        const kwM = joined.match(/([一-龥]{1,5}(?:省|自治区|市|区|县|镇|乡|街道))/);
+        if (kwM) {
+          let s = kwM.index;
+          while (s > 0 && /[一-龥]/.test(joined[s - 1])) s--;
+          const addrRaw = joined.substring(s).trim();
+          const before = joined.substring(0, s).trim();
+          receiver = pickName(before);
+          address = addrRaw;
+          if (!receiver) {
+            const trailing = stripTrailingName(addrRaw);
+            if (trailing) { receiver = trailing.name; address = trailing.addr; }
           }
+        } else {
+          receiver = pickName(joined);
+          if (receiver) { address = joined.replace(receiver, '').trim(); }
+          else { address = joined; }
         }
       }
 
-      if (!address) {
-        let merged = joined
-          .replace(/(?:收货人|收件人|联系人|手机号码|手机号|电话|所在地区|详细地址|地址)[:：]?/g, ' ')
-          .replace(phone || '', ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        if (receiver) {
-          const escaped = receiver.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          merged = merged.replace(new RegExp('^' + escaped), '').replace(new RegExp(escaped + '$'), '').trim();
-        }
-        merged = merged.replace(/^码[:：]?\s*/, '').trim();
-        address = merged;
+      function pickName(s) {
+        s = s.replace(/\s+/g, ' ').trim();
+        if (!s) return '';
+        const parts = s.split(/\s+/);
+        for (const p of parts) { if (NAME_RE.test(p) && !ADDR_TAIL.test(p)) return p; }
+        const chn = s.replace(/[^一-龥·]/g, '');
+        if (chn.length >= 2 && chn.length <= 8 && !ADDR_TAIL.test(chn)) return chn;
+        return '';
       }
+
+      function stripTrailingName(addr) {
+        const m = addr.match(/\s+([一-龥·]{2,8})$/);
+        if (m && !ADDR_TAIL.test(m[1])) return { name: m[1], addr: addr.substring(0, m.index).trim() };
+        return null;
+      }
+
+      if (receiver && address.startsWith(receiver)) address = address.substring(receiver.length).trim();
 
       if (receiver) receiverInput.value = receiver;
       if (phone) phoneInput.value = phone;
@@ -835,10 +887,13 @@
       document.body.appendChild(wrapper);
 
       try {
+        clone.style.webkitFontSmoothing = 'antialiased';
+        clone.style.textRendering = 'geometricPrecision';
+
         const canvas = await html2canvas(clone, {
           useCORS: true,
           backgroundColor: '#efefef',
-          scale: 2,
+          scale: 3,
           width: 828,
           windowWidth: 828,
           windowHeight: clone.scrollHeight,
@@ -889,7 +944,7 @@
     window.addEventListener('resize', updateStageScale);
     window.addEventListener('orientationchange', () => setTimeout(updateStageScale, 120));
 
-    randomCountdown();
+    randomizeStatusBar();
     applyAddress();
     updateStageScale();
   </script>
