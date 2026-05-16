@@ -85,21 +85,23 @@
 
     .editor-actions {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex-wrap: nowrap;
       margin-top: 6px;
     }
 
     .small-btn {
-      height: 40px;
-      padding: 0 14px;
-      border-radius: 20px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 19px;
       border: 0;
       background: #ff7b00;
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .small-btn.secondary {
@@ -631,9 +633,9 @@
     <textarea id="addressInput" class="textarea" placeholder="详细地址" style="min-height:50px;">XX省XX市XX区XX小区XX单元XX室</textarea>
     <div class="editor-actions">
       <button class="small-btn" id="parseBtn">粘贴并识别</button>
-      <button class="small-btn secondary" id="applyBtn">应用到页面</button>
-      <button class="small-btn secondary" id="fillSampleBtn">恢复示例</button>
-      <button class="small-btn export-btn" id="exportBtn">📷 导出截图</button>
+      <button class="small-btn secondary" id="applyBtn">应用</button>
+      <button class="small-btn secondary" id="fillSampleBtn">重置</button>
+      <button class="small-btn export-btn" id="exportBtn">导出截图</button>
     </div>
   </div>
 
