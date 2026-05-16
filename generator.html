@@ -621,12 +621,12 @@
   <!-- Editor (outside phone, sticky top) -->
   <div class="editor-panel">
     <div class="editor-title">地址录入</div>
-    <textarea id="fullAddressInput" class="textarea" placeholder="整段粘贴示例：&#10;收货人：张三 18888888888&#10;新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0"></textarea>
+    <textarea id="fullAddressInput" class="textarea" placeholder="粘贴收货信息，点击「粘贴并识别」自动拆分"></textarea>
     <div class="mini-grid">
-      <input id="receiverInput" class="input" placeholder="收货人" value="详细地址联系客服" />
+      <input id="receiverInput" class="input" placeholder="收货人" value="张三" />
       <input id="phoneInput" class="input" placeholder="手机号" value="18888888888" />
     </div>
-    <textarea id="addressInput" class="textarea" placeholder="详细地址" style="min-height:50px;">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</textarea>
+    <textarea id="addressInput" class="textarea" placeholder="详细地址" style="min-height:50px;">XX省XX市XX区XX小区XX单元XX室</textarea>
     <div class="editor-actions">
       <button class="small-btn" id="parseBtn">粘贴并识别</button>
       <button class="small-btn secondary" id="applyBtn">应用到页面</button>
@@ -693,11 +693,11 @@
           <div class="card">
             <div class="receiver-row">
               <span>收货人：</span>
-              <span id="receiverText">详细地址联系客服</span>
+              <span id="receiverText">张三</span>
               <span class="receiver-phone" id="phoneText">18888888888</span>
             </div>
             <div class="address">
-              <span id="addressText">新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0</span>
+              <span id="addressText">XX省XX市XX区XX小区XX单元XX室</span>
               <span class="copy" id="copyBtn">复制</span>
             </div>
 
@@ -788,9 +788,9 @@
     }
 
     function applyAddress() {
-      receiverText.textContent = receiverInput.value.trim() || '详细地址联系客服';
+      receiverText.textContent = receiverInput.value.trim() || '张三';
       phoneText.textContent = phoneInput.value.trim() || '18888888888';
-      addressText.textContent = addressInput.value.trim() || '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
+      addressText.textContent = addressInput.value.trim() || 'XX省XX市XX区XX小区XX单元XX室';
       requestAnimationFrame(updateStageScale);
     }
 
@@ -915,10 +915,10 @@
     document.getElementById('applyBtn').addEventListener('click', applyAddress);
 
     document.getElementById('fillSampleBtn').addEventListener('click', () => {
-      receiverInput.value = '详细地址联系客服';
+      receiverInput.value = '张三';
       phoneInput.value = '18888888888';
-      addressInput.value = '新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
-      fullAddressInput.value = '收货人：详细地址联系客服 18888888888\n新疆维吾尔自治区 乌鲁木齐市 乌鲁木齐县 宽店镇0';
+      addressInput.value = 'XX省XX市XX区XX小区XX单元XX室';
+      fullAddressInput.value = '';
       applyAddress();
     });
 
