@@ -878,6 +878,11 @@
 
     document.getElementById('applyBtn').addEventListener('click', applyAddress);
 
+    fullAddressInput.addEventListener('input', () => {
+      const v = fullAddressInput.value.trim();
+      if (v) parseCombinedText(v);
+    });
+
     receiverInput.addEventListener('input', applyAddress);
     phoneInput.addEventListener('input', applyAddress);
     addressInput.addEventListener('input', applyAddress);
