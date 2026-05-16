@@ -846,10 +846,17 @@
           scrollY: 0
         });
 
-        const link = document.createElement('a');
-        link.download = '退货退款详情截图.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+        const file = new File([blob], '退货退款详情.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+        } else {
+          const link = document.createElement('a');
+          link.download = '退货退款详情截图.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+        }
       } catch (err) {
         alert('导出失败');
       } finally {
@@ -857,11 +864,23 @@
       }
     }
 
-    document.getElementById('parseBtn').addEventListener('click', () => {
-      parseCombinedText(fullAddressInput.value);
+    document.getElementById('parseBtn').addEventListener('click', async () => {
+      try {
+        const clip = await navigator.clipboard.readText();
+        if (clip && clip.trim()) {
+          fullAddressInput.value = clip.trim();
+          parseCombinedText(clip);
+        }
+      } catch (e) {
+        if (fullAddressInput.value.trim()) parseCombinedText(fullAddressInput.value);
+      }
     });
 
     document.getElementById('applyBtn').addEventListener('click', applyAddress);
+
+    receiverInput.addEventListener('input', applyAddress);
+    phoneInput.addEventListener('input', applyAddress);
+    addressInput.addEventListener('input', applyAddress);
 
     document.getElementById('fillSampleBtn').addEventListener('click', () => {
       receiverInput.value = '张三';
