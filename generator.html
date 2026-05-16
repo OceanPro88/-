@@ -744,6 +744,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/address-parse@1.2.19/dist/bundle.js"></script>
   <script>
     const receiverInput = document.getElementById('receiverInput');
     const phoneInput = document.getElementById('phoneInput');
@@ -800,75 +801,21 @@
       const text = raw.replace(/\r/g, '\n').trim();
       if (!text) return;
 
-      const LABELS = /(?:收货人|收件人|联系人|姓名|名字|手机号码|手机号|联系电话|电话|手机|所在地区|收货地址|详细地址|地址|省市区|邮编)[:：\s]*/g;
-      const PROVINCES = '北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|台湾|内蒙古|广西|西藏|宁夏|新疆|香港|澳门';
-      const ADDR_TAIL = /(?:省|自治区|市|自治州|地区|盟|区|县|自治县|旗|镇|乡|街道|路|道|巷|弄|号|栋|幢|座|单元|室|楼|村|组|社区|小区|花园|苑|园|城|湾|庄|屯|营|堡|铺|大厦|广场|中心|工业园)/;
-      const NAME_RE = /^[一-龥·]{2,8}$/;
+      const r = AddressParse.ParseAddress(text)[0];
+      if (!r) return;
+      if (r.name) receiverInput.value = r.name;
+      if (r.mobile) phoneInput.value = r.mobile;
 
-      let joined = text.split(/\n+/).map(v => v.trim()).filter(Boolean).join(' ');
-      joined = joined.replace(LABELS, ' ').replace(/\s+/g, ' ').trim();
-
-      let phone = '', receiver = '', address = '';
-
-      const pm = joined.match(/1[3-9]\d[\s\-]?\d{4}[\s\-]?\d{4}/);
-      if (pm) {
-        phone = pm[0].replace(/[\s\-]/g, '');
-        joined = (joined.substring(0, pm.index) + ' ' + joined.substring(pm.index + pm[0].length)).replace(/\s+/g, ' ').trim();
-      }
-
-      const provRe = new RegExp('(' + PROVINCES + ')');
-      const provM = joined.match(provRe);
-
-      if (provM) {
-        const before = joined.substring(0, provM.index).trim();
-        const addrRaw = joined.substring(provM.index).trim();
-        receiver = pickName(before);
-        address = addrRaw;
-        if (!receiver) {
-          const trailing = stripTrailingName(addrRaw);
-          if (trailing) { receiver = trailing.name; address = trailing.addr; }
-        }
+      let addr = '';
+      if (r.city && r.province && r.city.startsWith(r.province)) {
+        addr = r.city;
       } else {
-        const kwM = joined.match(/([一-龥]{1,5}(?:省|自治区|市|区|县|镇|乡|街道))/);
-        if (kwM) {
-          let s = kwM.index;
-          while (s > 0 && /[一-龥]/.test(joined[s - 1])) s--;
-          const addrRaw = joined.substring(s).trim();
-          const before = joined.substring(0, s).trim();
-          receiver = pickName(before);
-          address = addrRaw;
-          if (!receiver) {
-            const trailing = stripTrailingName(addrRaw);
-            if (trailing) { receiver = trailing.name; address = trailing.addr; }
-          }
-        } else {
-          receiver = pickName(joined);
-          if (receiver) { address = joined.replace(receiver, '').trim(); }
-          else { address = joined; }
-        }
+        addr = (r.province || '') + (r.city || '');
       }
+      if (r.area) addr += r.area;
+      if (r.details) addr += r.details;
+      if (addr) addressInput.value = addr;
 
-      function pickName(s) {
-        s = s.replace(/\s+/g, ' ').trim();
-        if (!s) return '';
-        const parts = s.split(/\s+/);
-        for (const p of parts) { if (NAME_RE.test(p) && !ADDR_TAIL.test(p)) return p; }
-        const chn = s.replace(/[^一-龥·]/g, '');
-        if (chn.length >= 2 && chn.length <= 8 && !ADDR_TAIL.test(chn)) return chn;
-        return '';
-      }
-
-      function stripTrailingName(addr) {
-        const m = addr.match(/[\s,，、]+([一-龥·]{2,8})$/);
-        if (m && !ADDR_TAIL.test(m[1])) return { name: m[1], addr: addr.substring(0, m.index).trim() };
-        return null;
-      }
-
-      if (receiver && address.startsWith(receiver)) address = address.substring(receiver.length).trim();
-
-      if (receiver) receiverInput.value = receiver;
-      if (phone) phoneInput.value = phone;
-      if (address) addressInput.value = address;
       applyAddress();
     }
 
