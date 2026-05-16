@@ -859,7 +859,7 @@
       }
 
       function stripTrailingName(addr) {
-        const m = addr.match(/\s+([一-龥·]{2,8})$/);
+        const m = addr.match(/[\s,，、]+([一-龥·]{2,8})$/);
         if (m && !ADDR_TAIL.test(m[1])) return { name: m[1], addr: addr.substring(0, m.index).trim() };
         return null;
       }
