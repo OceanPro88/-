@@ -635,8 +635,7 @@
       <button class="small-btn" id="parseBtn">粘贴并识别</button>
       <button class="small-btn secondary" id="applyBtn">应用</button>
       <button class="small-btn secondary" id="fillSampleBtn">重置</button>
-      <button class="small-btn export-btn" id="exportBtn">存相册</button>
-      <button class="small-btn export-btn" id="downloadBtn">下载</button>
+      <button class="small-btn export-btn" id="exportBtn">导出截图</button>
     </div>
   </div>
 
@@ -843,27 +842,20 @@
       } finally { wrapper.remove(); }
     }
 
-    async function shareScreenshot() {
+    async function exportScreenshot() {
       try {
         const blob = await renderCanvas();
         const file = new File([blob], '退货退款详情.png', { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file] });
         } else {
-          alert('当前浏览器不支持存相册，请用「下载」');
+          const link = document.createElement('a');
+          link.download = '退货退款详情截图.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(link.href), 5000);
         }
       } catch (e) { if (e.name !== 'AbortError') alert('导出失败'); }
-    }
-
-    async function downloadScreenshot() {
-      try {
-        const blob = await renderCanvas();
-        const link = document.createElement('a');
-        link.download = '退货退款详情截图.png';
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-      } catch (e) { alert('导出失败'); }
     }
 
     document.getElementById('parseBtn').addEventListener('click', async () => {
@@ -910,8 +902,7 @@
       }
     });
 
-    document.getElementById('exportBtn').addEventListener('click', shareScreenshot);
-    document.getElementById('downloadBtn').addEventListener('click', downloadScreenshot);
+    document.getElementById('exportBtn').addEventListener('click', exportScreenshot);
 
     window.addEventListener('resize', updateStageScale);
     window.addEventListener('orientationchange', () => setTimeout(updateStageScale, 120));
