@@ -139,6 +139,36 @@
       will-change: transform;
     }
 
+    /* 自动截图模式只给本机导出使用，不影响正常编辑页面。 */
+    body.shot-mode {
+      display: block;
+      width: var(--shot-width);
+      height: var(--shot-height);
+      min-height: var(--shot-height);
+      overflow: hidden;
+    }
+
+    body.shot-mode .editor-panel {
+      display: none;
+    }
+
+    body.shot-mode .page-shell {
+      width: var(--shot-width);
+      max-width: none;
+      overflow: hidden;
+    }
+
+    body.shot-mode .scale-viewport {
+      width: var(--shot-width);
+      height: var(--shot-height) !important;
+      padding: 0;
+      justify-content: flex-start;
+    }
+
+    body.shot-mode .phone {
+      transform: none !important;
+    }
+
     .top-white {
       position: relative;
       height: 642px;
@@ -954,56 +984,152 @@
       requestAnimationFrame(updateStageScale);
     }
 
+    function normalizePastedText(raw) {
+      return raw
+        .replace(/\r/g, '\n')
+        .replace(/[　\t]+/g, ' ')
+        .replace(/[，,]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function cleanParsedName(name) {
+      let value = (name || '').replace(/\s+/g, '').trim();
+      const labelPattern = /^(?:商家|卖家|退货|寄回|寄件|收货|收件|地址|联系)?信息[:：]?|(?:商家|卖家|退货|寄回|寄件|收货|收件|地址|联系)?信息[:：]?$/g;
+      const edgeLabelPattern = /^(?:联系人|收件人|收货人|姓名|名字|商家名称|商家名)[:：]?|(?:联系人|收件人|收货人|姓名|名字|商家名称|商家名|手机号码|手机号|联系电话|电话|手机|所在地区|地区|省市区|详细地址|地址详情|地址信息)[:：]?$/g;
+
+      // 地址平台常把“退货信息/地址信息”这类标签贴到姓名旁边，这里只清理姓名边缘。
+      for (let i = 0; i < 4; i++) {
+        const next = value
+          .replace(edgeLabelPattern, '')
+          .replace(labelPattern, '')
+          .replace(/^[：:，,\s]+|[：:，,\s]+$/g, '')
+          .trim();
+        if (next === value) break;
+        value = next;
+      }
+      return value;
+    }
+
+    function normalizeMunicipalityAddress(address) {
+      return (address || '').replace(/^(北京|上海|天津|重庆)市?\1市/, '$1市');
+    }
+
+    function cleanParsedAddress(address) {
+      const value = (address || '')
+        .replace(/\s+/g, '')
+        .replace(/^(?:所在地区|地区|省市区|商家地址|退货地址|寄回地址|收件地址|收货地址|地址|详细地址|地址详情|地址信息)[:：]?/, '');
+      return normalizeMunicipalityAddress(value);
+    }
+
+    function extractLabeledValue(source, labels) {
+      const allLabels = '收件人|收货人|联系人|姓名|名字|商家名称|商家名|手机号码|手机号|联系电话|电话|手机|所在地区|地区|省市区|详细地址|地址详情|地址信息|商家地址|退货地址|寄回地址|收件地址|收货地址|地址';
+      const labelGroup = labels.join('|');
+      const re = new RegExp(`(?:^|[\\n\\s])(?:${labelGroup})\\s*[:：]\\s*([\\s\\S]*?)(?=(?:[\\n\\s]+(?:${allLabels})\\s*[:：])|$)`);
+      const match = source.match(re);
+      return match ? match[1].replace(/\s+/g, ' ').trim() : '';
+    }
+
+    function parseLabeledCombinedText(raw) {
+      const source = raw.replace(/\r/g, '\n').replace(/[　\t]+/g, ' ').trim();
+      const name = cleanParsedName(extractLabeledValue(source, ['收件人', '收货人', '联系人', '姓名', '名字', '商家名称', '商家名']));
+      const labeledPhone = extractLabeledValue(source, ['手机号码', '手机号', '联系电话', '电话', '手机']).match(/1[3-9]\d{9}/)?.[0] || '';
+      const phone = labeledPhone || source.match(/1[3-9]\d{9}/)?.[0] || '';
+      const region = cleanParsedAddress(extractLabeledValue(source, ['所在地区', '地区', '省市区']));
+      const detail = cleanParsedAddress(extractLabeledValue(source, ['详细地址', '地址详情', '地址信息', '商家地址', '退货地址', '寄回地址', '收件地址', '收货地址', '地址']));
+      const address = cleanParsedAddress(`${region}${detail}`);
+
+      if (!name && !phone && !address) return null;
+      return { name, mobile: phone, address };
+    }
+
     function fallbackParseCombinedText(text) {
       const phone = text.match(/1[3-9]\d{9}/)?.[0] || '';
       const withoutPhone = phone ? text.replace(phone, ' ') : text;
-      const normalized = withoutPhone.replace(/[，,]/g, ' ').replace(/\s+/g, ' ').trim();
+      const normalized = normalizePastedText(withoutPhone);
       const addressStart = normalized.search(/(?:北京市|天津市|上海市|重庆市|[^\s]{2,8}(?:省|自治区|特别行政区)|[^\s]{2,8}市|[^\s]{2,8}县)/);
       if (addressStart > 0) {
         return {
-          name: normalized.slice(0, addressStart).trim(),
+          name: cleanParsedName(normalized.slice(0, addressStart)),
           mobile: phone,
-          address: normalized.slice(addressStart).replace(/\s+/g, '')
+          address: cleanParsedAddress(normalized.slice(addressStart))
         };
       }
       const parts = normalized.split(' ').filter(Boolean);
       return {
-        name: parts[0] || '',
+        name: cleanParsedName(parts[0] || ''),
         mobile: phone,
-        address: parts.slice(1).join('')
+        address: cleanParsedAddress(parts.slice(1).join(''))
+      };
+    }
+
+    function buildParsedFromLibraryResult(result) {
+      if (!result) return null;
+      let address = '';
+      if (result.city && result.province && result.city.startsWith(result.province)) {
+        address = result.city;
+      } else {
+        address = (result.province || '') + (result.city || '');
+      }
+      address += (result.area || '') + (result.details || '');
+      return {
+        name: cleanParsedName(result.name || ''),
+        mobile: result.mobile || '',
+        address: cleanParsedAddress(address)
       };
     }
 
     function parseCombinedText(raw) {
-      const text = raw.replace(/\r/g, '\n').trim();
+      const text = normalizePastedText(raw);
       if (!text) return;
 
-      let parsed = null;
-      try {
-        if (window.AddressParse) {
-          const result = AddressParse.ParseAddress(text)[0];
-          if (result) {
-            let address = '';
-            if (result.city && result.province && result.city.startsWith(result.province)) {
-              address = result.city;
-            } else {
-              address = (result.province || '') + (result.city || '');
-            }
-            address += (result.area || '') + (result.details || '');
-            parsed = { name: result.name || '', mobile: result.mobile || '', address };
+      // 有明确字段标签时先按标签拆分，避免“手机号码/所在地区/详细地址”混进姓名或地址。
+      let parsed = parseLabeledCombinedText(raw);
+      if (!parsed) {
+        try {
+          if (window.AddressParse) {
+            const result = AddressParse.ParseAddress(text)[0];
+            parsed = buildParsedFromLibraryResult(result);
           }
+        } catch (e) {
+          parsed = null;
         }
-      } catch (e) {
-        parsed = null;
       }
 
-      // 外部 address-parse（地址解析库）失败时，用手机号和空格做兜底拆分。
-      if (!parsed) parsed = fallbackParseCombinedText(text);
+      // 外部 address-parse（地址解析库）失败或结果不完整时，用手机号和空格做兜底拆分。
+      if (!parsed || !parsed.name || !parsed.mobile || !parsed.address) {
+        const fallback = fallbackParseCombinedText(text);
+        parsed = {
+          name: parsed?.name || fallback.name,
+          mobile: parsed?.mobile || fallback.mobile,
+          address: parsed?.address || fallback.address
+        };
+      }
 
       if (parsed.name) receiverInput.value = parsed.name;
       if (parsed.mobile) phoneInput.value = parsed.mobile;
       if (parsed.address) addressInput.value = parsed.address;
       applyAddress();
+    }
+
+    function applyQueryPreset() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('shot') === '1') document.body.classList.add('shot-mode');
+
+      const combinedText = params.get('text');
+      if (combinedText) {
+        fullAddressInput.value = combinedText;
+        parseCombinedText(combinedText);
+        return;
+      }
+
+      const name = params.get('name');
+      const phone = params.get('phone');
+      const address = params.get('address');
+      if (name) receiverInput.value = cleanParsedName(name);
+      if (phone) phoneInput.value = phone.trim();
+      if (address) addressInput.value = cleanParsedAddress(address);
+      if (name || phone || address) applyAddress();
     }
 
     async function renderCanvas() {
@@ -1101,6 +1227,7 @@
     window.addEventListener('orientationchange', () => setTimeout(updateStageScale, 120));
 
     randomizeStatusBar();
+    applyQueryPreset();
     applyAddress();
     updateStageScale();
   </script>
