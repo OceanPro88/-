@@ -1022,6 +1022,33 @@
       return normalizeMunicipalityAddress(value);
     }
 
+    function findAddressStart(text) {
+      return text.search(/(?:北京市|天津市|上海市|重庆市|[^\s]{2,8}(?:省|自治区|特别行政区)|[^\s]{2,8}市|[^\s]{2,8}县)/);
+    }
+
+    function parseAddressFirstText(text) {
+      const phone = text.match(/1[3-9]\d{9}/)?.[0] || '';
+      if (!phone) return null;
+
+      const beforePhone = normalizePastedText(text.replace(phone, ' '));
+      if (findAddressStart(beforePhone) !== 0) return null;
+
+      const parts = beforePhone.split(' ').filter(Boolean);
+      if (parts.length < 2) return null;
+
+      const nameCandidate = cleanParsedName(parts[parts.length - 1]);
+      const addressCandidate = cleanParsedAddress(parts.slice(0, -1).join(''));
+
+      // 处理“地址 姓名 手机号”格式：最后一个短词才当姓名，避免把整段地址误当成姓名。
+      if (!nameCandidate || nameCandidate.length > 6 || !addressCandidate) return null;
+
+      return {
+        name: nameCandidate,
+        mobile: phone,
+        address: addressCandidate
+      };
+    }
+
     function extractLabeledValue(source, labels) {
       const allLabels = '收件人|收货人|联系人|姓名|名字|商家名称|商家名|手机号码|手机号|联系电话|电话|手机|所在地区|地区|省市区|详细地址|地址详情|地址信息|商家地址|退货地址|寄回地址|收件地址|收货地址|地址';
       const labelGroup = labels.join('|');
@@ -1039,7 +1066,7 @@
       const detail = cleanParsedAddress(extractLabeledValue(source, ['详细地址', '地址详情', '地址信息', '商家地址', '退货地址', '寄回地址', '收件地址', '收货地址', '地址']));
       const address = cleanParsedAddress(`${region}${detail}`);
 
-      if (!name && !phone && !address) return null;
+      if (!name && !labeledPhone && !region && !detail) return null;
       return { name, mobile: phone, address };
     }
 
@@ -1047,7 +1074,7 @@
       const phone = text.match(/1[3-9]\d{9}/)?.[0] || '';
       const withoutPhone = phone ? text.replace(phone, ' ') : text;
       const normalized = normalizePastedText(withoutPhone);
-      const addressStart = normalized.search(/(?:北京市|天津市|上海市|重庆市|[^\s]{2,8}(?:省|自治区|特别行政区)|[^\s]{2,8}市|[^\s]{2,8}县)/);
+      const addressStart = findAddressStart(normalized);
       if (addressStart > 0) {
         return {
           name: cleanParsedName(normalized.slice(0, addressStart)),
@@ -1085,6 +1112,7 @@
 
       // 有明确字段标签时先按标签拆分，避免“手机号码/所在地区/详细地址”混进姓名或地址。
       let parsed = parseLabeledCombinedText(raw);
+      if (!parsed) parsed = parseAddressFirstText(text);
       if (!parsed) {
         try {
           if (window.AddressParse) {

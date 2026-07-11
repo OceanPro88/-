@@ -67,6 +67,7 @@ import sys
 
 text = sys.argv[1].strip()
 all_labels = r"收件人|收货人|联系人|姓名|名字|商家名称|商家名|手机号码|手机号|联系电话|电话|手机|所在地区|地区|省市区|详细地址|地址详情|地址信息|商家地址|退货地址|寄回地址|收件地址|收货地址|地址"
+address_start_re = re.compile(r"(?:北京市|天津市|上海市|重庆市|[^\s]{2,8}(?:省|自治区|特别行政区)|[^\s]{2,8}市|[^\s]{2,8}县)")
 
 def extract_label(labels):
   label_group = "|".join(labels)
@@ -79,6 +80,12 @@ phone = phone_match.group(0) if phone_match else ""
 name_part = extract_label(["收件人", "收货人", "联系人", "姓名", "名字", "商家名称", "商家名"])
 if not name_part:
   name_part = text[:phone_match.start()].strip() if phone_match else "退货"
+  before_phone = re.sub(r"[，,]", " ", name_part)
+  before_phone = re.sub(r"\s+", " ", before_phone).strip()
+  parts = [part for part in before_phone.split(" ") if part]
+  # 文件名也兼容“地址 姓名 手机号”格式，避免截图名变成整段地址。
+  if len(parts) >= 2 and address_start_re.search(before_phone) and address_start_re.search(before_phone).start() == 0:
+    name_part = parts[-1]
 name_part = re.sub(r"\s+", "", name_part)
 name_part = re.sub(r"(?:商家|卖家|退货|寄回|寄件|收货|收件|地址|联系)?信息$", "", name_part)
 name_part = re.sub(r"^(?:联系人|收件人|收货人|姓名|名字|商家名称|商家名)[:：]?", "", name_part)
