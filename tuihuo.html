@@ -1033,6 +1033,16 @@
       const beforePhone = normalizePastedText(text.replace(phone, ' '));
       if (findAddressStart(beforePhone) !== 0) return null;
 
+      const compactMatch = beforePhone.match(/^(.+(?:菜鸟驿站|驿站|小区|社区|花园|家园|嘉园|公寓|大厦|中心|广场|一期|二期|三期|四期|五期|[0-9一二三四五六七八九十]+号楼|[0-9一二三四五六七八九十]+栋|[0-9一二三四五六七八九十]+幢|[0-9一二三四五六七八九十]+室|湾|苑|府|园|城))([\u4e00-\u9fa5]{2,4})$/);
+      if (compactMatch && !beforePhone.includes(' ')) {
+        // 兼容“地址姓名手机号”连写：必须先命中明确地址尾词，才拆最后 2-4 个中文作姓名。
+        return {
+          name: cleanParsedName(compactMatch[2]),
+          mobile: phone,
+          address: cleanParsedAddress(compactMatch[1])
+        };
+      }
+
       const parts = beforePhone.split(' ').filter(Boolean);
       if (parts.length < 2) return null;
 

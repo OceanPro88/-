@@ -68,6 +68,7 @@ import sys
 text = sys.argv[1].strip()
 all_labels = r"收件人|收货人|联系人|姓名|名字|商家名称|商家名|手机号码|手机号|联系电话|电话|手机|所在地区|地区|省市区|详细地址|地址详情|地址信息|商家地址|退货地址|寄回地址|收件地址|收货地址|地址"
 address_start_re = re.compile(r"(?:北京市|天津市|上海市|重庆市|[^\s]{2,8}(?:省|自治区|特别行政区)|[^\s]{2,8}市|[^\s]{2,8}县)")
+compact_address_name_re = re.compile(r"^(.+(?:菜鸟驿站|驿站|小区|社区|花园|家园|嘉园|公寓|大厦|中心|广场|一期|二期|三期|四期|五期|[0-9一二三四五六七八九十]+号楼|[0-9一二三四五六七八九十]+栋|[0-9一二三四五六七八九十]+幢|[0-9一二三四五六七八九十]+室|湾|苑|府|园|城))([\u4e00-\u9fa5]{2,4})$")
 
 def extract_label(labels):
   label_group = "|".join(labels)
@@ -86,6 +87,11 @@ if not name_part:
   # 文件名也兼容“地址 姓名 手机号”格式，避免截图名变成整段地址。
   if len(parts) >= 2 and address_start_re.search(before_phone) and address_start_re.search(before_phone).start() == 0:
     name_part = parts[-1]
+  elif address_start_re.search(before_phone) and address_start_re.search(before_phone).start() == 0:
+    # 兼容“地址姓名手机号”连写文件名：只在地址尾词明确时拆出最后 2-4 个中文姓名。
+    compact_match = compact_address_name_re.match(before_phone)
+    if compact_match:
+      name_part = compact_match.group(2)
 name_part = re.sub(r"\s+", "", name_part)
 name_part = re.sub(r"(?:商家|卖家|退货|寄回|寄件|收货|收件|地址|联系)?信息$", "", name_part)
 name_part = re.sub(r"^(?:联系人|收件人|收货人|姓名|名字|商家名称|商家名)[:：]?", "", name_part)
